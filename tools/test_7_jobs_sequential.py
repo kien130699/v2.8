@@ -192,22 +192,22 @@ class SequentialTester:
             self.log("INIT", "Không lấy được danh sách templates", level="ERROR")
             return {"ok": False, "error": "no templates"}
 
-        # Define 7 distinct tests
+        # Define 7 distinct tests matching available templates
         suite_plan = [
-            (1, "BASIC_RUN_ORCHESTRATION", "1", {"celebrity": "Donald Trump"}, "NORMAL"),
-            (2, "SCENE_CHECKPOINT_INTEGRITY", "2", {"topic": "Review son môi"}, "NORMAL"),
-            (3, "MEDIA_TRACKING_LIFECYCLE", "3", {"topic": "Dạy con tự lập"}, "NORMAL"),
-            (4, "DOWNLOAD_LOCAL_PERSISTENCE", "4", {"keyword": "áo thun nam"}, "NORMAL"),
-            (5, "FAILED_ATTEMPT_RETRY_ISOLATION", "5", {"theme": "Phối đồ mùa đông"}, "NORMAL"),
-            (6, "CANCEL_JOB_IDENTITY_GUARD", "6", {"topic": "Bài học chia sẻ"}, "INJECT_CANCEL"),
-            (7, "FULL_FLOW_AND_QC_PIPELINE", "7", {"keyword": "kem chống nắng"}, "NORMAL"),
+            (1, "BASIC_RUN_ORCHESTRATION", "1", {}, "NORMAL"),
+            (2, "SCENE_CHECKPOINT_INTEGRITY", "2", {}, "NORMAL"),
+            (3, "MEDIA_TRACKING_LIFECYCLE", "3", {}, "NORMAL"),
+            (4, "DOWNLOAD_LOCAL_PERSISTENCE", "4", {}, "NORMAL"),
+            (5, "FAILED_ATTEMPT_RETRY_ISOLATION", "5", {}, "NORMAL"),
+            (6, "CANCEL_JOB_IDENTITY_GUARD", "6", {}, "INJECT_CANCEL"),
+            (7, "FULL_FLOW_AND_QC_PIPELINE", "7", {}, "NORMAL"),
         ]
 
         for seq, name, tpl_id, cfg, mode in suite_plan:
             res = self.execute_job(seq, name, tpl_id, cfg, mode)
             self.job_results.append(res)
             
-            st = res.get("lastStatus")
+            st = res.get("lastStatus") or res.get("status")
             ok = st in {"completed", "done", "published", "dry_run_ok", "cancelled"} or (not self.real_flow and st in {"waiting_flow", "queued"})
             if not ok and self.fail_fast:
                 self.log("SUITE", f"DỪNG TOÀN BỘ SUITE TẠI JOB {seq} DO FAIL_FAST=TRUE", level="ERROR")
@@ -229,12 +229,12 @@ class SequentialTester:
             f"=======================================================",
         ]
         for r in self.job_results:
-            seq = r.get("sequence")
-            name = r.get("name")
-            st = r.get("lastStatus")
-            el = r.get("elapsedSec")
+            seq = r.get("sequence") or 0
+            name = r.get("name") or "Unknown"
+            st = r.get("lastStatus") or r.get("status") or "FAILED"
+            el = r.get("elapsedSec") if r.get("elapsedSec") is not None else 0
             badge = "✅" if st in {"completed", "done", "published", "dry_run_ok", "cancelled", "waiting_flow", "queued"} else "❌"
-            txt_lines.append(f"Job {seq:02d} | {name:<35} | {badge} {st:<15} | {el}s")
+            txt_lines.append(f"Job {seq:02d} | {name:<35} | {badge} {str(st):<15} | {el}s")
         txt_lines.append(f"=======================================================\n")
         txt_content = "\n".join(txt_lines)
         (self.out_dir / "summary.txt").write_text(txt_content, encoding="utf-8")
