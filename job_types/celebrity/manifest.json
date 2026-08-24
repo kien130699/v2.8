@@ -1,0 +1,398 @@
+{
+  "id": "1",
+  "slug": "celebrity",
+  "name": "Người nổi tiếng",
+  "engine": "celebrity",
+  "description": "BROLL/celebrity V2.4→V2.7. Giữ pool người nổi tiếng + prompt/search/hook/TTS/subtitle; Facebook dùng core V2.8.",
+  "defaults": {
+    "theme": "life",
+    "celebrity_pool": [
+      "Elon Musk",
+      "Jeff Bezos",
+      "Bill Gates",
+      "Warren Buffett",
+      "Bernard Arnault",
+      "Mark Zuckerberg",
+      "Larry Ellison",
+      "Larry Page",
+      "Sergey Brin",
+      "Steve Ballmer",
+      "Michael Bloomberg",
+      "Mukesh Ambani",
+      "Gautam Adani",
+      "Amancio Ortega",
+      "Carlos Slim",
+      "Francoise Bettencourt Meyers",
+      "Alice Walton",
+      "Rob Walton",
+      "Jim Walton",
+      "MacKenzie Scott",
+      "Michael Dell",
+      "Jensen Huang",
+      "Phil Knight",
+      "Jack Ma",
+      "Pony Ma",
+      "Zhang Yiming",
+      "Colin Huang",
+      "Tadashi Yanai",
+      "Masayoshi Son",
+      "Lee Jae-yong",
+      "Jay Y. Lee",
+      "Li Ka-shing",
+      "Henry Cheng",
+      "Peter Woo",
+      "Richard Li",
+      "N. R. Narayana Murthy",
+      "Azim Premji",
+      "Radhakishan Damani",
+      "Shiv Nadar",
+      "Kumar Mangalam Birla",
+      "Cyrus Poonawalla",
+      "Savitri Jindal",
+      "Gina Rinehart",
+      "Andrew Forrest",
+      "James Packer",
+      "Rupert Murdoch",
+      "Lachlan Murdoch",
+      "Oprah Winfrey",
+      "George Lucas",
+      "Steven Spielberg",
+      "Tyler Perry",
+      "Michael Jordan",
+      "Tiger Woods",
+      "LeBron James",
+      "Cristiano Ronaldo",
+      "Lionel Messi",
+      "David Beckham",
+      "Roger Federer",
+      "Floyd Mayweather",
+      "Jay-Z",
+      "Rihanna",
+      "Taylor Swift",
+      "Beyonce",
+      "Kim Kardashian",
+      "Kylie Jenner",
+      "Kanye West",
+      "Dr. Dre",
+      "Sean Combs",
+      "Madonna",
+      "Paul McCartney",
+      "Bono",
+      "Andrew Lloyd Webber",
+      "J. K. Rowling",
+      "Shonda Rhimes",
+      "Reese Witherspoon",
+      "Dwayne Johnson",
+      "George Clooney",
+      "Tom Cruise",
+      "Jackie Chan",
+      "Shah Rukh Khan",
+      "Salman Khan",
+      "Amitabh Bachchan",
+      "Jerry Seinfeld",
+      "Ellen DeGeneres",
+      "Howard Stern",
+      "Simon Cowell",
+      "Gordon Ramsay",
+      "Martha Stewart",
+      "Robert F. Smith",
+      "David Tepper",
+      "Ken Griffin",
+      "Ray Dalio",
+      "George Soros",
+      "Carl Icahn",
+      "Stephen Schwarzman",
+      "Peter Thiel",
+      "Reid Hoffman",
+      "Marc Benioff",
+      "Brian Chesky",
+      "Travis Kalanick",
+      "Evan Spiegel",
+      "Daniel Ek",
+      "Patrick Collison",
+      "John Collison",
+      "Sam Altman",
+      "Tim Cook",
+      "Satya Nadella",
+      "Sundar Pichai",
+      "Sheryl Sandberg",
+      "Susan Wojcicki",
+      "Meg Whitman",
+      "Indra Nooyi",
+      "Sara Blakely",
+      "Tory Burch",
+      "Giorgio Armani",
+      "Ralph Lauren",
+      "Miuccia Prada",
+      "Domenico Dolce",
+      "Stefano Gabbana",
+      "Francois Pinault",
+      "Alain Wertheimer",
+      "Gerard Wertheimer",
+      "Dieter Schwarz",
+      "Reinhold Wuerth",
+      "Klaus-Michael Kuehne",
+      "Stefan Quandt",
+      "Susanne Klatten",
+      "Hasso Plattner",
+      "Andreas von Bechtolsheim",
+      "Jan Koum",
+      "Dustin Moskovitz",
+      "Eduardo Saverin",
+      "David Velez",
+      "Jorge Paulo Lemann",
+      "Marcel Telles",
+      "Carlos Sicupira",
+      "Joseph Safra",
+      "Eduardo Costantini",
+      "Ricardo Salinas Pliego",
+      "German Larrea",
+      "Iris Fontbona",
+      "Andronico Luksic",
+      "Eyal Ofer",
+      "Idan Ofer",
+      "Roman Abramovich",
+      "Alisher Usmanov",
+      "Mikhail Fridman",
+      "Len Blavatnik",
+      "James Dyson",
+      "Richard Branson",
+      "Joe Lewis",
+      "Jim Ratcliffe",
+      "Lakshmi Mittal",
+      "Denise Coates",
+      "Mike Ashley",
+      "Peter Jones",
+      "Alan Sugar",
+      "Dietrich Mateschitz",
+      "Mark Cuban",
+      "Barbara Corcoran",
+      "Daymond John",
+      "Kevin O'Leary",
+      "Lori Greiner",
+      "Ratan Tata",
+      "Anand Mahindra",
+      "Tony Fernandes",
+      "Robert Kuok",
+      "Lucio Tan",
+      "Henry Sy Jr.",
+      "Jaime Zobel de Ayala",
+      "Vincent Tan",
+      "Charoen Sirivadhanabhakdi",
+      "Dhanin Chearavanont",
+      "Thaksin Shinawatra",
+      "Vichai Srivaddhanaprabha",
+      "Aliko Dangote",
+      "Nassef Sawiris",
+      "Patrice Motsepe",
+      "Johann Rupert",
+      "Isabel dos Santos"
+    ],
+    "posts_per_day": 2,
+    "slot1": "10:00",
+    "slot2": "19:00",
+    "model": "",
+    "script_prompt": "Viết script ngắn, sắc, có hook mạnh, kể một bài học về tiền bạc, kỷ luật, tư duy giàu có hoặc quyết định lớn trong sự nghiệp; tránh bịa số liệu, tránh giật tít rẻ tiền.",
+    "search_query_template": "recent high quality interview podcast keynote conversation with clear face and natural speech -shorts -fanmade -compilation -deepfake -AI voice",
+    "broll_queries": [
+      "city night aerial drone traffic cinematic moving lights",
+      "modern city night aerial drone traffic timelapse cinematic"
+    ],
+    "hook_duration_min": 4.0,
+    "hook_duration_max": 5.0,
+    "voice_language": "zh-CN",
+    "edge_voice": "zh-CN-YunxiNeural",
+    "tts_rate": "+0%",
+    "subtitle_language": "vi-VN",
+    "subtitle_font": "Arial",
+    "subtitle_font_size": 58,
+    "subtitle_max_words": 7,
+    "subtitle_max_chars": 38,
+    "broll_clip_count": 2,
+    "motion_min_score": 2.0,
+    "motion_attempts": 5,
+    "audio_mode": "visual_only",
+    "mute_original_audio": true,
+    "face_verify": true,
+    "face_min_hits": 3,
+    "face_min_score": 35.0,
+    "image_model": "Nano Banana 2",
+    "video_model": "Veo 3.1 - Fast",
+    "video_duration": "8s"
+  },
+  "schema": {
+    "theme": {
+      "type": "text",
+      "label": "Chủ đề"
+    },
+    "image_model": {
+      "type": "select",
+      "label": "Mô hình tạo ảnh",
+      "options": [
+        "Nano Banana 2",
+        "Nano Banana 2 Lite",
+        "Nano Banana Pro"
+      ]
+    },
+    "video_model": {
+      "type": "select",
+      "label": "Mô hình tạo video",
+      "options": [
+        "Veo 3.1 - Fast",
+        "Veo 3.1 - Lite",
+        "Veo 3.1 - Lite [Lower Priority]",
+        "Veo 3.1 - Quality",
+        "Gemini Omni Flash"
+      ]
+    },
+    "video_duration": {
+      "type": "select",
+      "label": "Độ dài clip video",
+      "options": [
+        "8s",
+        "16s",
+        "24s",
+        "32s"
+      ]
+    },
+    "celebrity_pool": {
+      "type": "tags",
+      "label": "Danh sách người nổi tiếng"
+    },
+    "script_prompt": {
+      "type": "textarea",
+      "label": "Prompt viết script"
+    },
+    "search_query_template": {
+      "type": "textarea",
+      "label": "Prompt/query tìm celebrity"
+    },
+    "broll_queries": {
+      "type": "lines",
+      "label": "Prompt/query B-roll"
+    },
+    "posts_per_day": {
+      "type": "number",
+      "label": "Video/ngày",
+      "min": 1,
+      "max": 8
+    },
+    "slot1": {
+      "type": "time",
+      "label": "Khung giờ 1"
+    },
+    "slot2": {
+      "type": "time",
+      "label": "Khung giờ 2"
+    },
+    "model": {
+      "type": "text",
+      "label": "Model script (trống=mặc định)"
+    },
+    "hook_duration_min": {
+      "type": "number",
+      "label": "Hook tối thiểu (s)",
+      "min": 2,
+      "max": 12
+    },
+    "hook_duration_max": {
+      "type": "number",
+      "label": "Hook tối đa (s)",
+      "min": 2,
+      "max": 12
+    },
+    "voice_language": {
+      "type": "select",
+      "label": "Ngôn ngữ voice",
+      "options": [
+        "zh-CN",
+        "vi-VN"
+      ]
+    },
+    "edge_voice": {
+      "type": "text",
+      "label": "Edge TTS voice"
+    },
+    "tts_rate": {
+      "type": "text",
+      "label": "TTS rate"
+    },
+    "subtitle_language": {
+      "type": "select",
+      "label": "Subtitle",
+      "options": [
+        "vi-VN",
+        "zh-CN",
+        "en-US"
+      ]
+    },
+    "subtitle_font": {
+      "type": "text",
+      "label": "Font subtitle"
+    },
+    "subtitle_font_size": {
+      "type": "number",
+      "label": "Cỡ subtitle",
+      "min": 24,
+      "max": 120
+    },
+    "subtitle_max_words": {
+      "type": "number",
+      "label": "Max từ/sub",
+      "min": 3,
+      "max": 15
+    },
+    "subtitle_max_chars": {
+      "type": "number",
+      "label": "Max ký tự/sub",
+      "min": 15,
+      "max": 80
+    },
+    "broll_clip_count": {
+      "type": "number",
+      "label": "Số B-roll",
+      "min": 1,
+      "max": 6
+    },
+    "motion_min_score": {
+      "type": "number",
+      "label": "Motion min score",
+      "min": 0,
+      "max": 20
+    },
+    "motion_attempts": {
+      "type": "number",
+      "label": "Motion attempts",
+      "min": 1,
+      "max": 20
+    },
+    "audio_mode": {
+      "type": "select",
+      "label": "Celebrity audio",
+      "options": [
+        "visual_only",
+        "original_then_voice"
+      ]
+    },
+    "mute_original_audio": {
+      "type": "checkbox",
+      "label": "Mute audio celebrity"
+    },
+    "face_verify": {
+      "type": "checkbox",
+      "label": "Verify face"
+    },
+    "face_min_hits": {
+      "type": "number",
+      "label": "Face min hits",
+      "min": 1,
+      "max": 10
+    },
+    "face_min_score": {
+      "type": "number",
+      "label": "Face min score",
+      "min": 0,
+      "max": 100
+    }
+  }
+}

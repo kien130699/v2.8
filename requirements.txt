@@ -1,0 +1,14 @@
+fastapi>=0.128,<1
+uvicorn[standard]>=0.40,<1
+pydantic>=2.10,<3
+requests>=2.32,<3
+httpx>=0.28,<1
+python-dotenv>=1.0,<2
+python-multipart>=0.0.20,<1
+websockets>=15,<16
+Pillow>=10,<12
+edge-tts>=7.2,<8
+yt-dlp>=2026.7,<2027
+opencv-python-headless>=4.10,<5
+tzdata>=2026.1,<2027
+cryptography>=42.0,<48.0

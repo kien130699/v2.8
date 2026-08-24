@@ -1,0 +1,20 @@
+{
+  "provider": "ytsearch",
+  "google_result": {
+    "provider": "ytsearch",
+    "title": "Warren Buffett: Coronavirus outbreak shouldn't affect what investors do with stocks",
+    "link": "https://www.youtube.com/watch?v=_1-415v3YC8",
+    "snippet": "Berkshire Hathaway's chairman and CEO Warren Buffett told CNBC's Becky Quick on Monday that while the coronavirus outbreak ...",
+    "channel": "CNBC Television",
+    "duration_text": "",
+    "position": 4,
+    "image_url": ""
+  },
+  "source_url": "https://www.youtube.com/watch?v=_1-415v3YC8",
+  "title": "Warren Buffett: Coronavirus outbreak shouldn't affect what investors do with stocks",
+  "uploader": "CNBC Television",
+  "webpage_url": "https://www.youtube.com/watch?v=_1-415v3YC8",
+  "duration": 108,
+  "extractor": "Youtube",
+  "note": "Original celebrity audio is forcibly muted by V2.4 renderer. Verify reuse rights for your use case."
+}

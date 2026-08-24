@@ -1,0 +1,3 @@
+file 'D:\YT\Code\V2.8_Facebook_Job_Factory\modules\facebook\engine_v27\work\clip_000_celebrity.mp4'
+file 'D:\YT\Code\V2.8_Facebook_Job_Factory\modules\facebook\engine_v27\work\clip_001.mp4'
+file 'D:\YT\Code\V2.8_Facebook_Job_Factory\modules\facebook\engine_v27\work\clip_002.mp4'

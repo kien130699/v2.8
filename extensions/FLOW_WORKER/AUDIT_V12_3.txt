@@ -1,0 +1,7 @@
+v12.3 targeted stability fix
+
+1. Page/background/manifest version = 12.3.0
+2. VIDEO request-start timeout = min(videoTimeout, 45s)
+3. Reference-to-video matcher requires exact reference imageMediaId
+4. Reference-to-video no longer rejects request only because prompt text differs
+5. No scheduler/UI/queue behavior changed

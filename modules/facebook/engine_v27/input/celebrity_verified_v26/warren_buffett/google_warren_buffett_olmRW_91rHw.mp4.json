@@ -1,0 +1,20 @@
+{
+  "provider": "ytsearch",
+  "google_result": {
+    "provider": "ytsearch",
+    "title": "CNBC's Interview with Warren Buffett July 15th 2026 (1080p HD)",
+    "link": "https://www.youtube.com/watch?v=olmRW_91rHw",
+    "snippet": "After downing his third Cherry Coke of the morning (On Camera, Berkshire owns the company), 95-year-old Warren Buffett ...",
+    "channel": "David Blackwell",
+    "duration_text": "",
+    "position": 2,
+    "image_url": ""
+  },
+  "source_url": "https://www.youtube.com/watch?v=olmRW_91rHw",
+  "title": "CNBC's Interview with Warren Buffett July 15th 2026 (1080p HD)",
+  "uploader": "David Blackwell",
+  "webpage_url": "https://www.youtube.com/watch?v=olmRW_91rHw",
+  "duration": 3596,
+  "extractor": "Youtube",
+  "note": "Original celebrity audio is forcibly muted by V2.4 renderer. Verify reuse rights for your use case."
+}

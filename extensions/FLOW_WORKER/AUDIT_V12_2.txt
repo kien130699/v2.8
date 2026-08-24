@@ -1,0 +1,8 @@
+v12.2 AUDIT
+- JS syntax: background/page/popup PASS
+- HAR Network fixture: 14/14 PASS
+- Queue Scheduler: 22/22 PASS
+- UI / Project / All Media / exact-search: 13/13 PASS
+- Versions: manifest/background/page = 12.2.0
+- Asset search: exact trim only; no forced trailing period
+- Project bootstrap: Flow route -> Project creation -> All Media

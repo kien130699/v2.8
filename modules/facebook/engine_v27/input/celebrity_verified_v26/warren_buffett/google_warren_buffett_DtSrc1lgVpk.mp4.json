@@ -1,0 +1,21 @@
+{
+  "provider": "google_serper_video",
+  "google_result": {
+    "provider": "google_serper_video",
+    "title": "Squawk Pod: Warren Buffett in Omaha - 03/31/26 | Audio Only",
+    "link": "https://www.youtube.com/watch?v=DtSrc1lgVpk",
+    "snippet": "In his first interview since stepping down as CEO of Berkshire Hathaway, Warren Buffett sits down with CNBC's Becky Quick in Omaha.",
+    "channel": "CNBC Television",
+    "duration_text": "1:12:05",
+    "date": "Mar 31, 2026",
+    "position": 5,
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgW7d9ow67XdVwyKGFNSfGvWKM7eL3E4BlBEM8lS3Unf-rC4mNBpQp3A&s"
+  },
+  "source_url": "https://www.youtube.com/watch?v=DtSrc1lgVpk",
+  "title": "Squawk Pod: Warren Buffett in Omaha - 03/31/26 | Audio Only",
+  "uploader": "CNBC Television",
+  "webpage_url": "https://www.youtube.com/watch?v=DtSrc1lgVpk",
+  "duration": 4324,
+  "extractor": "Youtube",
+  "note": "Original celebrity audio is forcibly muted by V2.4 renderer. Verify reuse rights for your use case."
+}

@@ -1,0 +1,22 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const bg=fs.readFileSync(path.join(root,'background.js'),'utf8');
+const page=fs.readFileSync(path.join(root,'page.js'),'utf8');
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));
+function ok(c,m){if(!c)throw new Error(m);console.log('PASS',m)}
+ok(manifest.version==='14.5.20','1 extension bumped to v14.5');
+ok(bg.includes("if (url.includes('uploadImage')) return 'IMAGE_UPLOAD'"),'2 Flow upload requests are observed');
+ok(bg.includes("'DOM.setFileInputFiles'")&&bg.includes("input[type=\"file\"]"),'3 local file injected through CDP file input');
+ok(page.includes('getUploadImagePoint')&&page.includes('from device'),'4 page exposes Upload/From device locator fallback');
+ok(bg.includes('inputImages=Array.isArray(scene?.inputImages)')&&bg.includes('path:String(item?.path'),'5 server scene inputImages are preserved');
+ok(bg.includes('ensureSceneImageInputs(tabId,record,options)'),'6 image references attach before image generation');
+ok(bg.includes('GLOBAL_ASSET_CACHE')&&bg.includes('assetCache:GLOBAL_ASSET_CACHE'),'7 cross-job mediaId cache reuses model photo');
+ok(bg.includes('waitUploadImageAfterMarker')&&bg.includes("event?.kind!=='IMAGE_UPLOAD'"),'8 upload response is correlated after marker');
+ok(bg.includes('findUploadedMediaByName')&&bg.includes('listSearchedImages'),'9 filename fallback recovers mediaId if response shape changes');
+ok(bg.includes('compactServerResults')&&bg.includes('safeResults=compactServerResults'),'10 server result strips raw request/network payloads');
+ok(bg.includes('results:safeResults,failures:safeFailures')&&bg.includes('results:safeResults}'),'11 server job sends only compact results');
+ok(bg.includes('REF PACK VERIFIED')&&bg.includes('REF GATE BLOCKED')&&bg.includes('verifyComposerRefIncrease'),'12 strict reference verification blocks Create when any ref is missing');
+ok(bg.includes('reloadAndNormalizeFlow')&&bg.includes('không thấy chỗ upload ảnh'),'13 wrong Flow/upload view triggers F5/project recovery');
+ok(bg.includes('asset chưa index/stale')&&bg.includes('retry exact mediaId'),'14 generated asset stale picker gets hard recovery');
+console.log('14/14 v14.5.20 wardrobe upload assertions passed');

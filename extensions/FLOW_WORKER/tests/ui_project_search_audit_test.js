@@ -1,0 +1,22 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const bg=fs.readFileSync(path.join(root,'background.js'),'utf8');
+const page=fs.readFileSync(path.join(root,'page.js'),'utf8');
+const pop=fs.readFileSync(path.join(root,'popup.js'),'utf8');
+const html=fs.readFileSync(path.join(root,'popup.html'),'utf8');
+function ok(c,m){if(!c)throw new Error(m);console.log('PASS',m)}
+ok(html.includes('data-tab-target="runTab"')&&html.includes('data-tab-target="settingsTab"')&&html.includes('data-tab-target="guideTab"'),'1 popup has Run / Settings / Guide tabs');
+ok(html.includes('id="settingsTab"')&&html.includes('id="imageModel"')&&html.includes('id="imageTimeoutSec"'),'2 long settings moved into Settings tab');
+ok(html.includes('id="guideTab"')&&html.includes('1 tab · 1 nút Create · 1 submit dispatcher'),'3 long explanation moved into Guide');
+ok(pop.includes('flowPairAutoUiTab')&&pop.includes('activateTab'),'4 popup remembers selected UI tab');
+ok(!pop.includes("Hãy mở đúng tab Google Flow"),'5 popup no longer blocks bootstrap outside Flow');
+ok(bg.includes("const FLOW_TOOL_URL='https://labs.google/fx/tools/flow'"),'6 background can navigate current tab to Flow');
+ok(bg.includes('ensureProjectAndAllMedia(tabId)')&&bg.includes("getCreateProjectPoint"),'7 project bootstrap is wired');
+ok(page.includes('getCreateProjectPoint')&&page.includes('findCreateProjectButton'),'8 page exposes safe create-project locator');
+ok(bg.includes("getAllMediaPoint")&&bg.includes("VIEW READY → All Media"),'9 All Media normalization wired');
+ok(page.includes('findAllMediaButton')&&page.includes("label==='all media'"),'10 All Media locator uses supplied accessible label');
+ok(bg.includes("return String(value??'').trim();")&&!bg.includes("return base?`${base}.`:''"),'11 asset search preserves exact punctuation; no forced period');
+ok(bg.includes('assetSearchCandidatesForRecord'),'12 asset search uses candidates but exact mediaId remains authoritative');
+ok(bg.includes('referenceMediaId:options.imageEnabled?record.selectedImage.mediaId:null'),'13 video still binds exact imageMediaId');
+console.log('13/13 v14 UI/project/search assertions passed');

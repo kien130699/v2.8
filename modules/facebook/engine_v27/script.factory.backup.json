@@ -1,0 +1,106 @@
+{
+  "title": "Ti-n-mua-c-nhi-u-th-nh-ng-kh-ng-mua-l-i-th-i-gian",
+  "output": {
+    "width": 1080,
+    "height": 1920
+  },
+  "voice": {
+    "language": "zh-CN",
+    "edge_voice": "zh-CN-YunxiNeural",
+    "fallback_voices": [
+      "zh-CN-YunyangNeural",
+      "zh-CN-XiaoxiaoNeural"
+    ],
+    "rate": "+0%"
+  },
+  "subtitle_language": "vi-VN",
+  "narration_segments": [
+    {
+      "zh": "钱可以买到很多东西，但买不回已经失去的时间。",
+      "vi": "Tiền có thể mua nhiều thứ, nhưng không mua lại được thời gian đã mất."
+    },
+    {
+      "zh": "年轻时我们用时间换钱，后来才发现时间更贵。",
+      "vi": "Khi trẻ ta dùng thời gian đổi lấy tiền, rồi sau đó mới nhận ra thời gian còn đắt hơn."
+    },
+    {
+      "zh": "真正富有的人，懂得保护自己的时间。",
+      "vi": "Người thật sự giàu có biết bảo vệ thời gian của mình."
+    },
+    {
+      "zh": "不要把最宝贵的东西，浪费在不值得的事情上。",
+      "vi": "Đừng lãng phí thứ quý giá nhất của bạn vào những việc không xứng đáng."
+    }
+  ],
+  "style": {
+    "mode": "reference",
+    "broll_clip_count": 2,
+    "motion_min_score": 2,
+    "motion_attempts": 8,
+    "broll_queries": [
+      "city night aerial drone traffic cinematic moving lights",
+      "modern city night aerial drone traffic timelapse cinematic"
+    ]
+  },
+  "celebrity": {
+    "enabled": true,
+    "required": true,
+    "name": "Warren Buffett",
+    "source_mode": "search",
+    "folder": "input/celebrity_verified_v26/warren_buffett",
+    "search_provider": "google_serper",
+    "search_query": "Warren Buffett interview speaking close up face CNBC",
+    "ytsearch_query": "Warren Buffett interview CNBC speaking conversation -Munger",
+    "search_results": 15,
+    "search_download_count": 4,
+    "refresh_search": false,
+    "min_source_duration": 20,
+    "max_source_duration": 7200,
+    "duration_min": 4.0,
+    "duration_max": 5.0,
+    "start_padding": 20.0,
+    "avoid_recent": 80,
+    "audio_mode": "visual_only",
+    "mute_original_audio": true,
+    "start_strategy": "early",
+    "start_window_max": 600,
+    "crop_bottom_fraction": 0.22,
+    "require_name_in_title": true,
+    "name_position_max": 45,
+    "exclude_title_keywords": [
+      "charles munger",
+      "charlie munger",
+      "becoming warren buffett",
+      "documentary",
+      "reaction",
+      "motivation"
+    ],
+    "face_verify": true,
+    "face_min_hits": 1,
+    "face_min_score": 20,
+    "face_scan_start_min": 25,
+    "face_scan_end_max": 900,
+    "face_scan_max_windows": 30
+  },
+  "scenes": [
+    {
+      "text": "fallback",
+      "query": "city night aerial drone traffic"
+    }
+  ],
+  "factory_meta": {
+    "topic": "Tiền mua được nhiều thứ nhưng không mua lại thời gian",
+    "page_theme": "life",
+    "caption_vi": "Tiền mua được nhiều thứ nhưng không mua lại thời gian",
+    "v28_config_applied": true,
+    "business_date": "TEST-20260824-153614-36d3",
+    "job_id": "test_b949348436d3",
+    "page_name": "Người nổi tiếng 1.1"
+  },
+  "subtitle_style": {
+    "font": "Arial",
+    "font_size": 58,
+    "max_words": 7,
+    "max_chars": 38
+  }
+}

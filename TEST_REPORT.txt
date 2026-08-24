@@ -1,0 +1,13 @@
+V2.8.5.4 PORT ISOLATION / 9ROUTER POLICY
+
+PASS targets:
+- FLOW_WORKER manifest 14.7.0; localhost host_permissions/CSP only port 3000.
+- Worker bridge URL is hard-fixed to ws://127.0.0.1:3000/ws/flow and popup URL is readonly.
+- No extension discovery/migration/connection logic for server 8786/8787/8897.
+- V2.8 master sets V28_ISOLATED_FLOW=1 and in-process legacy AGENT_PORT resolves to V28_PORT=3000.
+- Edge debug ownership documented as 9224; V2.8 contains no scanner/killer/connector for 9222/9223.
+- 9ROUTER_API_KEY and 9ROUTER_BASE_URL supported in celebrity/beauty/parenting.
+- Facebook LLM generic provider fallback disabled; GPT/Gemini require 9Router.
+- Existing 2.8.5.3 queue/lifecycle/asset-index fixes retained.
+
+V2.8.5.9: simulated inherited PYTHONIOENCODING=cp1252. Old child exits UnicodeEncodeError; build_subprocess_env overrides UTF-8 and Vietnamese output exits 0. WINDOWS_CHARMAP_REGRESSION_OK.

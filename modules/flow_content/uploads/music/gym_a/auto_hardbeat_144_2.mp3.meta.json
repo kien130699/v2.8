@@ -1,0 +1,16 @@
+{
+  "source_url": "",
+  "source_host": "AUTO_HARD_BEAT",
+  "profile_id": "gym_a",
+  "sha256": "ff06648676b180ab65990e5d271811b8c23445b0ea941fb2abe4ac88b44f2d2d",
+  "size": 577196,
+  "imported_at": "2026-08-14T10:01:14+00:00",
+  "auto_generated": true,
+  "bpm": 144,
+  "style": "gym_hard_super_shake",
+  "duration": 24.0,
+  "format": "mp3",
+  "codec": "mp3",
+  "channels": 2,
+  "sample_rate": "48000"
+}

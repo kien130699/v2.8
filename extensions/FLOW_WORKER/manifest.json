@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "FLOW_WORKER (Flow Wardrobe Studio Worker)",
+  "version": "14.8.0",
+  "description": "V2.8 worker: Flow, Shopee research, affiliate custom_link via local 3000.",
+  "permissions": [
+    "debugger",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "storage",
+    "downloads",
+    "alarms",
+    "power",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://labs.google/*",
+    "http://127.0.0.1:3000/*",
+    "http://localhost:3000/*",
+    "https://shopee.vn/*",
+    "https://*.shopee.vn/*",
+    "https://shope.ee/*",
+    "https://affiliate.shopee.vn/*",
+    "https://*.affiliate.shopee.vn/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Flow Wardrobe Studio"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' ws://127.0.0.1:3000 ws://localhost:3000 http://127.0.0.1:3000 http://localhost:3000"
+  }
+}

@@ -1,0 +1,216 @@
+{
+  "id": "3",
+  "slug": "parenting",
+  "name": "Mẹ & Bé",
+  "engine": "parenting",
+  "description": "UI hiển thị tiếng Việt; prompt gửi Flow/AI bằng tiếng Anh.",
+  "defaults": {
+    "character_set_id": "mother_girl_01",
+    "topic": "Một tình huống đời thường giúp cha mẹ hiểu cảm xúc của con nhỏ",
+    "scene_count": 4,
+    "dialogue_turns_per_scene": 4,
+    "model": "",
+    "burn_subtitles": true,
+    "tone": "ấm áp, tự nhiên, hữu ích, không phán xét",
+    "mother_visual_prompt": "Young Asian mother around 30 years old, oval gentle face, warm brown eyes, long dark brown slightly wavy hair, cream blouse, sage green pants or skirt, patient and reassuring expression, premium 3D family animation film style, warm cinematic lighting.",
+    "mother_voice_prompt": "Vietnamese adult female voice, warm, gentle, calm, patient, natural conversational pacing.",
+    "child_visual_prompt": "4-year-old Asian girl, round cute face, large brown eyes, short dark bob hair, pink pastel pajamas, holding a beige teddy bear, shy and emotional but lovable, premium 3D family animation film style, warm cinematic lighting.",
+    "child_voice_prompt": "Vietnamese little girl voice, cute, soft, slightly higher pitch, emotional but clear, natural childlike pacing.",
+    "product_reveal_scene": 1,
+    "story_template_id": "auto",
+    "product_url": "",
+    "output_duration": "random_30_35s",
+    "job_type": "hybrid",
+    "template_mode": "parenting",
+    "shopee_products": [],
+    "product_video_mode": "one_product_per_video",
+    "affiliate_required": true,
+    "image_model": "Nano Banana 2",
+    "video_model": "Veo 3.1 - Fast",
+    "video_duration": "8s"
+  },
+  "schema": {
+    "character_set_id": {
+      "type": "text",
+      "label": "Bộ nhân vật"
+    },
+    "image_model": {
+      "type": "select",
+      "label": "Mô hình tạo ảnh",
+      "options": [
+        "Nano Banana 2",
+        "Nano Banana 2 Lite",
+        "Nano Banana Pro"
+      ]
+    },
+    "video_model": {
+      "type": "select",
+      "label": "Mô hình tạo video",
+      "options": [
+        "Veo 3.1 - Fast",
+        "Veo 3.1 - Lite",
+        "Veo 3.1 - Lite [Lower Priority]",
+        "Veo 3.1 - Quality",
+        "Gemini Omni Flash"
+      ]
+    },
+    "video_duration": {
+      "type": "select",
+      "label": "Độ dài clip video",
+      "options": [
+        "8s",
+        "16s",
+        "24s",
+        "32s"
+      ]
+    },
+    "mother_visual_prompt": {
+      "type": "textarea",
+      "label": "Mô tả hình Mẹ"
+    },
+    "mother_voice_prompt": {
+      "type": "textarea",
+      "label": "Mô tả giọng Mẹ"
+    },
+    "child_visual_prompt": {
+      "type": "textarea",
+      "label": "Mô tả hình Bé"
+    },
+    "child_voice_prompt": {
+      "type": "textarea",
+      "label": "Mô tả giọng Bé"
+    },
+    "topic": {
+      "type": "textarea",
+      "label": "Chủ đề / ý tưởng video"
+    },
+    "tone": {
+      "type": "textarea",
+      "label": "Tone nội dung"
+    },
+    "scene_count": {
+      "type": "number",
+      "label": "Số cảnh",
+      "min": 1,
+      "max": 8
+    },
+    "dialogue_turns_per_scene": {
+      "type": "number",
+      "label": "Số lượt thoại mỗi cảnh",
+      "min": 1,
+      "max": 12
+    },
+    "model": {
+      "type": "text",
+      "label": "Model viết kịch bản"
+    },
+    "burn_subtitles": {
+      "type": "checkbox",
+      "label": "Đốt subtitle vào video"
+    },
+    "product_url": {
+      "type": "textarea",
+      "label": "Link sản phẩm Shopee"
+    },
+    "output_duration": {
+      "type": "select",
+      "label": "Độ dài output",
+      "options": [
+        "random_30_35s",
+        "30s",
+        "31s",
+        "32s",
+        "33s",
+        "34s",
+        "35s",
+        "8s",
+        "16s",
+        "24s"
+      ]
+    },
+    "product_reveal_scene": {
+      "type": "number",
+      "label": "Clip hiện sản phẩm",
+      "min": 1,
+      "max": 4
+    },
+    "story_template_id": {
+      "type": "select",
+      "label": "Mẫu kể chuyện Shopee",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Tự chọn"
+        },
+        {
+          "value": "direct_demo",
+          "label": "Demo trực tiếp"
+        },
+        {
+          "value": "problem_solution",
+          "label": "Vấn đề → giải pháp"
+        },
+        {
+          "value": "unbox_play",
+          "label": "Mở hộp / chơi thử"
+        },
+        {
+          "value": "before_after",
+          "label": "Trước → sau"
+        },
+        {
+          "value": "mini_challenge",
+          "label": "Thử thách nhỏ"
+        }
+      ]
+    },
+    "job_type": {
+      "type": "select",
+      "label": "Template Job",
+      "options": [
+        {
+          "value": "parenting",
+          "label": "1 · MẸ & BÉ"
+        },
+        {
+          "value": "shopee",
+          "label": "2 · SHOPEE"
+        },
+        {
+          "value": "hybrid",
+          "label": "3 · MẸ & BÉ + SHOPEE"
+        },
+        {
+          "value": "english_context",
+          "label": "4 · DẠY TIẾNG ANH · THEO NGỮ CẢNH"
+        },
+        {
+          "value": "mother_teaches_ai",
+          "label": "5 · DẠY CON · BÀI HỌC / QUY TẮC / TÌNH HUỐNG"
+        }
+      ]
+    },
+    "shopee_products": {
+      "type": "product_basket",
+      "label": "Product Basket Shopee"
+    },
+    "product_video_mode": {
+      "type": "select",
+      "label": "Mode video sản phẩm",
+      "options": [
+        {
+          "value": "one_product_per_video",
+          "label": "Mỗi SP tạo 1 video"
+        },
+        {
+          "value": "multi_product_one_video",
+          "label": "Ghép nhiều SP vào 1 video"
+        }
+      ]
+    },
+    "affiliate_required": {
+      "type": "checkbox",
+      "label": "Caption/Facebook chỉ dùng affiliate_url"
+    }
+  }
+}

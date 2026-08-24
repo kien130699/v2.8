@@ -1,0 +1,21 @@
+const fs=require('fs');
+const path=require('path');
+const root=path.resolve(__dirname,'..');
+const bg=fs.readFileSync(path.join(root,'background.js'),'utf8');
+const page=fs.readFileSync(path.join(root,'page.js'),'utf8');
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json'),'utf8'));
+let n=0;function ok(v,msg){n++;if(!v){console.error('FAIL',n,msg);process.exit(1)}console.log('PASS',n,msg)}
+ok(manifest.version==='14.5.20','extension v14.5');
+ok(bg.includes('mediaMetadata?.mediaTitle'),'captures Flow generated mediaTitle from video response');
+ok(page.includes('input[data-testid="search-input"]'),'uses All Media search input');
+ok(page.includes('getVideoTileInfoByMediaId'),'locates exact video tile by mediaId');
+ok(page.includes("u.searchParams.get('name')"),'reads exact mediaId from video src name query');
+ok(bg.includes('locateExactVideoTile'),'extend locator is wired');
+ok(bg.includes('videoExtendFactor'),'x1/x2/x3 factor is wired');
+ok(bg.includes('runVideoExtendPhase'),'separate extend phase exists');
+ok(bg.includes('Add Clip')||page.includes('Add Clip'),'Add Clip is recognized');
+ok(page.includes('keyboard_double_arrow_right'),'Extend menu semantic icon is recognized');
+ok(page.includes('what happens next'),'Extend prompt Slate is recognized');
+ok(bg.includes("type:'VIDEO_CHAIN_INFO'"),'ordered primary chain is reported to server');
+ok(bg.includes('await runQueueScheduler') && bg.indexOf('await runVideoExtendPhase')>bg.indexOf('await runQueueScheduler'),'extend runs after base queue to avoid editor/submit collisions');
+console.log(`${n}/${n} video extend assertions passed`);

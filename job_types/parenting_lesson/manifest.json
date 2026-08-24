@@ -1,0 +1,40 @@
+{
+  "id": "5",
+  "slug": "parenting_lesson",
+  "name": "Mẹ & Bé: Bài Học Đời Thường (3D Pixar)",
+  "engine": "parenting",
+  "description": "Tự động sinh video 3D Pixar 32s (4 scenes x 8s) bài học đời sống, đối đáp thông minh giữa Mẹ & Bé, kèm bài học đúc kết ngắn gọn và cảm xúc.",
+  "defaults": {
+    "topic": "Bé lười ăn rau và màn đối đáp siêu bất ngờ với mẹ",
+    "theme": "mother_teaches_life_lessons",
+    "clip_duration": "8s",
+    "scene_count": 4,
+    "video_model": "Veo 3.1 - Fast",
+    "image_model": "Nano Banana 2",
+    "aspect_ratio": "9:16"
+  },
+  "schema": {
+    "topic": {
+      "type": "text",
+      "label": "Chủ đề / Tình huống đời thường"
+    },
+    "theme": {
+      "type": "select",
+      "label": "Phong cách nội dung",
+      "options": [
+        {
+          "value": "mother_teaches_life_lessons",
+          "label": "Mẹ dạy bé bài học thực tế"
+        },
+        {
+          "value": "kid_curious_questions",
+          "label": "Bé đặt câu hỏi hóc búa"
+        },
+        {
+          "value": "emotional_bonding",
+          "label": "Gắn kết tình cảm gia đình"
+        }
+      ]
+    }
+  }
+}

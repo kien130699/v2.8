@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flow Wardrobe Studio</title>
+<style>
+*{box-sizing:border-box}body{width:410px;margin:0;padding:12px;font-family:Arial,sans-serif;color:#171717;background:#fff}h1{font-size:17px;margin:0}.sub{font-size:11px;color:#777;margin-top:3px}.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:10px 0}.tabBtn{min-height:34px;margin:0;padding:6px;border:1px solid #d4d4d4;border-radius:7px;background:#f6f6f6;color:#222;font-weight:700;font-size:12px}.tabBtn.active{background:#111;color:#fff;border-color:#111}.tabPane{display:none}.tabPane.active{display:block}.miniNote{font-size:12px;line-height:1.4;color:#555;margin:0 0 8px}.guide{font-size:12px;line-height:1.55;color:#444}.guide p{margin:0 0 10px}.guide code{font-family:Consolas,monospace;background:#f3f3f3;padding:1px 4px;border-radius:4px}.guide ul{padding-left:20px;margin:5px 0 12px}textarea{width:100%;min-height:118px;resize:vertical;padding:10px;font:13px/1.45 monospace;border:1px solid #ccc;border-radius:7px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}label{display:block;font-size:11px;margin-bottom:4px;color:#555}select,input{width:100%;min-height:34px;border:1px solid #ccc;border-radius:6px;padding:6px 8px;background:#fff}.toggleRow{display:flex;align-items:center;gap:7px;min-height:34px;border:1px solid #ccc;border-radius:6px;padding:6px 8px;color:#222;font-size:12px}.toggleRow input{width:auto;min-height:auto;margin:0}.runBtn{width:100%;min-height:42px;margin-top:10px;border:0;border-radius:7px;background:#111;color:#fff;font-weight:700;cursor:pointer}.runBtn:disabled{opacity:.55;cursor:default}#progressWrap{margin-top:10px;padding:10px;border-radius:8px;background:#f5f5f5}#progressHead{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:6px}#progressLabel{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#progressBar{height:12px;background:#ddd;border-radius:999px;overflow:hidden}#progressFill{height:100%;width:0%;background:#111;transition:width .25s}#progressDetail,#queueStats{margin-top:6px;font-size:11px;color:#666}#queueStats{font-weight:700}#status{margin-top:10px;padding:9px;min-height:135px;max-height:210px;overflow:auto;border-radius:6px;background:#f5f5f5;white-space:pre-wrap;font-size:12px;line-height:1.4}#status[data-level="error"]{background:#fff0f0}#status[data-level="success"]{background:#effaf1}.small{font-size:11px;color:#666;margin-top:6px}.sectionTitle{font-size:12px;font-weight:700;margin:3px 0 6px}.autoBadge{display:inline-block;margin-top:4px;padding:4px 7px;border-radius:999px;background:#f2f2f2;font-size:11px;color:#555}
+.extBrand{display:flex;align-items:center;gap:9px}.extBrand img{width:36px;height:36px;border-radius:9px}.extBrandText{min-width:0}.extBadge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:999px;background:#eef0ff;color:#5544a8;margin-left:4px}
+</style>
+</head>
+<body>
+  <div class="extBrand"><img src="icon48.png" alt=""><div class="extBrandText"><h1>Flow Wardrobe Studio <span class="extBadge">Worker 14.7.0</span></h1><div class="sub">V2.8 ONLY · WS 3000 · Edge 9224 · GLOBAL settings · IMAGE / VIDEO queue</div></div></div>
+  <div class="grid" style="margin-top:9px"><div><label>Ngôn ngữ / Language</label><select id="uiLanguage"><option value="vi">Tiếng Việt</option><option value="en">English</option></select></div><div><label>Giới hạn luồng</label><div class="toggleRow">Theo Flow Settings GLOBAL</div></div></div>
+
+  <div class="tabs">
+    <button class="tabBtn active" type="button" data-tab-target="runTab">Chạy</button>
+    <button class="tabBtn" type="button" data-tab-target="settingsTab">Cài đặt</button>
+    <button class="tabBtn" type="button" data-tab-target="guideTab">Hướng dẫn</button>
+  </div>
+
+  <section id="runTab" class="tabPane active">
+    <div class="miniNote">Mỗi dòng: <b>imagePrompt|videoPrompt</b></div>
+    <textarea id="pairs">1 cat|đang chạy
+1 con rồng|đang bay</textarea>
+    <div class="autoBadge">Tự kiểm tra Project + chuyển về All Media trước khi chạy</div>
+    <button id="run" class="runBtn">CHẠY 1 TAB / N JOB</button>
+    <div id="progressWrap">
+      <div id="progressHead"><div id="progressLabel">Chưa chạy</div><div id="progressPercent">0%</div></div>
+      <div id="progressBar"><div id="progressFill"></div></div>
+      <div id="progressDetail">1 tab · submit queue FIFO.</div>
+      <div id="queueStats">IMAGE 0 · VIDEO 0 · GLOBAL concurrency · DONE 0/0 · ERROR 0</div>
+    </div>
+    <div id="status" data-level="info">Sẵn sàng.</div>
+    <div class="small">Popup có thể đóng/mất focus; state vẫn lưu trong background/storage.</div>
+  </section>
+
+  <section id="settingsTab" class="tabPane">
+
+    <div class="sectionTitle" style="margin-top:12px">Server tổng</div>
+    <div class="grid">
+      <div><label>Kết nối server</label><label class="toggleRow"><input id="serverEnabled" type="checkbox" checked> <span>Tự nhận job từ server</span></label></div>
+      <div><label>Trạng thái</label><div id="serverBadge" class="toggleRow">● Đang kiểm tra...</div></div>
+    </div>
+    <div style="margin-top:8px"><label>WebSocket URL</label><input id="serverUrl" value="ws://127.0.0.1:3000/ws/flow" readonly></div>
+
+    <div class="sectionTitle">Model & đồng thời</div>
+    <div class="grid">
+      <div><label>Image model</label><select id="imageModel"><option>Nano Banana Pro</option><option>Nano Banana 2 Lite</option><option selected>Nano Banana 2</option><option value="NONE">None — bỏ ảnh</option></select></div>
+      <div><label>Video model</label><select id="videoModel"><option>Veo 3.1 - Lite</option><option>Veo 3.1 - Lite [Lower Priority]</option><option>Veo 3.1 - Fast</option><option>Veo 3.1 - Quality</option><option value="Gemini Omni Flash" selected>Gemini Omni Flash</option><option value="NONE">None — bỏ video</option></select></div>
+    </div>
+    <div class="grid">
+      <div><label>Ảnh đồng thời</label><select id="imageConcurrency"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9" selected>9</option><option value="10">10</option></select></div>
+      <div><label>Video đồng thời</label><select id="videoConcurrency"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
+    </div>
+
+    <div class="sectionTitle" style="margin-top:12px">Submit Queue & tải video</div>
+    <div class="grid">
+      <div><label>Chính sách Submit Queue</label><select id="submitPolicy"><option value="VIDEO_LIGHT" selected>FIFO nhóm + ưu tiên video nhẹ</option><option value="GLOBAL_FIFO">FIFO tổng — đến trước chạy trước</option></select></div>
+      <div><label>Auto download video</label><label class="toggleRow"><input id="autoDownloadVideo" type="checkbox"> <span>Tự tải khi SUCCESSFUL</span></label></div>
+    </div>
+    <div class="grid">
+      <div><label>Max Create / phút</label><input id="maxSubmitsPerMinute" type="number" min="0" max="60" value="6"></div>
+      <div><label>Khoảng cách Create (ms)</label><input id="submitGapMs" type="number" min="0" max="60000" step="100" value="1000"></div>
+    </div>
+
+    <div class="sectionTitle" style="margin-top:12px">Output</div>
+    <div class="grid">
+      <div><label>Tỉ lệ</label><select id="aspectRatio"><option value="16:9" selected>16:9</option><option value="9:16">9:16</option></select></div>
+      <div><label>Số ảnh / Create</label><select id="imageOutputs"><option>x1</option><option>x2</option><option>x3</option><option>x4</option></select></div>
+      <div><label>Video duration</label><select id="videoDuration"><option>4s</option><option>6s</option><option selected>8s</option><option>10s</option></select></div>
+      <div><label>Video base / Create</label><select id="videoOutputs"><option>x1</option><option>x2</option><option>x3</option><option>x4</option></select><small>Server Extend mode giữ base ở x1.</small></div>
+    </div>
+
+    <div class="sectionTitle" style="margin-top:12px">Timeout</div>
+    <div class="grid">
+      <div><label>Timeout ảnh (giây)</label><input id="imageTimeoutSec" type="number" min="60" max="1800" value="300"></div>
+      <div><label>Timeout video (giây)</label><input id="videoTimeoutSec" type="number" min="60" max="3600" value="900"></div>
+    </div>
+  </section>
+
+  <section id="guideTab" class="tabPane guide">
+    <p><b>Thủ công:</b> mỗi dòng <code>imagePrompt|videoPrompt</code>. <b>Server:</b> nhận trực tiếp <code>RUN_FLOW_JOB</code> JSON, popup có thể đóng hoàn toàn.</p>
+    <p><b>Kiến trúc:</b> 1 tab · 1 nút Create · 1 submit dispatcher. Ảnh giữ đầy tối đa 9 slot, video tối đa 4 slot. IMAGE và VIDEO chỉ xếp hàng; dispatcher xử lý từng submit nên không đụng Settings/Prompt/Asset Picker cùng lúc.</p>
+    <p><b>Submit mặc định:</b> FIFO từng nhóm + ưu tiên video nhẹ. Trong mỗi nhóm vẫn đúng thứ tự; khi video có slot và đã có ảnh sẵn sàng thì video được lấy trước.</p>
+    <p><b>Ingredient:</b> nếu Flow dịch prompt ảnh sang tiếng Anh, extension dùng prompt/title mà Flow trả về để lọc Asset Picker, sau đó vẫn bắt buộc chọn đúng <code>imageMediaId</code>. Chuỗi Search được giữ <b>nguyên văn</b>; không tự thêm hoặc bỏ dấu chấm.</p>
+    <p><b>Project/View:</b> khi bấm Chạy, extension kiểm tra URL. Nếu chưa ở Flow thì mở Flow; nếu chưa ở Project thì tự bấm tạo Project mới; sau đó tự chuyển về <b>All Media</b> trước khi thao tác.</p>
+    <ul>
+      <li>Đóng DevTools trước khi chạy vì extension cần <code>chrome.debugger</code>.</li>
+      <li>Nếu Flow yêu cầu xác minh thủ công, xử lý xác minh rồi chạy lại.</li>
+      <li>Max Create/phút và khoảng cách Create phải đặt phù hợp giới hạn tài khoản.</li>
+    <li>V2.8 chỉ dùng <code>ws://127.0.0.1:3000/ws/flow</code> trên Edge debug 9224. Không dùng/scan 8786, 8787, 9222 hoặc 9223.</li>
+    </ul>
+  </section>
+
+<script src="i18n.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

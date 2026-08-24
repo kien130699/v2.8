@@ -1,0 +1,11 @@
+v12.1 audit targets
+- page/background/manifest version sync
+- no worker tabs
+- one queue dispatcher
+- IMAGE default 9, VIDEO default 3
+- FIFO per group + light video priority selectable
+- GLOBAL FIFO selectable
+- exact Network request correlation retained
+- auto-download only after video lifecycle success
+- downloads permission present
+- quota stops NEW submit while existing lifecycles keep monitoring

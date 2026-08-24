@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Facebook Content Factory</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">F</div><div><b>Content Factory</b><small>Facebook Automation V3.1</small></div></div>
+    <nav>
+      <button class="nav active" data-tab="dashboard">◫ Dashboard</button>
+      <button class="nav" data-tab="pages">◎ Pages</button>
+      <button class="nav" data-tab="jobs">▦ Jobs</button>
+      <button class="nav" data-tab="settings">⚙ Settings</button>
+    </nav>
+    <div class="side-bottom"><span id="wsDot" class="dot"></span><span id="wsText">Realtime connecting</span></div>
+  </aside>
+
+  <main>
+    <header>
+      <div><h1 id="pageTitle">Dashboard</h1><p>10 Pages · 20 video/ngày · voice Trung + sub Việt · tự render + tự publish</p></div>
+      <div class="controls">
+        <button class="btn primary" id="testVideoBtn">🎬 TEST VIDEO</button>
+        <button class="btn success" id="startBtn">▶ START</button>
+        <button class="btn warn" id="pauseBtn">Ⅱ PAUSE</button>
+        <button class="btn danger" id="stopBtn">■ STOP</button>
+      </div>
+    </header>
+
+    <section id="tab-dashboard" class="tab active">
+      <div class="statusbar"><span id="factoryBadge" class="badge stopped">STOPPED</span><span id="serverClock">--</span><span id="autoPublishBadge" class="badge muted">AUTO PUBLISH OFF</span><span id="llmBadge" class="badge muted">LLM --</span></div>
+      <div class="cards">
+        <article><span>Target hôm nay</span><strong id="kTarget">20</strong></article>
+        <article><span>Published</span><strong id="kPublished">0</strong></article>
+        <article><span>Ready</span><strong id="kReady">0</strong></article>
+        <article><span>Running</span><strong id="kRunning">0</strong></article>
+        <article><span>Failed</span><strong id="kFailed">0</strong></article>
+      </div>
+      <div class="grid2">
+        <section class="panel"><div class="panel-head"><h2>Pages hôm nay</h2><button class="mini" id="planBtn">Tạo kế hoạch hôm nay</button></div><div id="pageStats"></div></section>
+        <section class="panel"><div class="panel-head"><h2>Live activity</h2><span class="muted-text">WebSocket</span></div><div id="liveLog" class="live-log"></div></section>
+      </div>
+      <section class="panel"><div class="panel-head"><h2>Jobs gần nhất</h2><button class="mini" onclick="loadJobs()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Page</th><th>Slot</th><th>Topic</th><th>Step</th><th>Progress</th><th>Status</th><th></th></tr></thead><tbody id="jobsBody"></tbody></table></div></section>
+    </section>
+
+    <section id="tab-pages" class="tab">
+      <section class="panel"><div class="panel-head"><div><h2>10 Facebook Pages</h2><p class="muted-text">Token không lưu trong DB; mỗi Page trỏ tới một biến ENV.</p></div></div><div id="pagesEditor"></div></section>
+    </section>
+
+    <section id="tab-jobs" class="tab">
+      <section class="panel"><div class="panel-head"><h2>Job Queue</h2><button class="mini" onclick="loadJobs(true)">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Page</th><th>Lịch</th><th>Topic</th><th>Step</th><th>Status</th><th>Output</th></tr></thead><tbody id="jobsFullBody"></tbody></table></div></section>
+      <section class="panel" id="jobDetailPanel"><div class="panel-head"><h2>Job detail</h2></div><div id="jobDetail" class="empty">Chọn một job để xem log/output.</div></section>
+    </section>
+
+    <section id="tab-settings" class="tab">
+      <section class="panel settings-grid">
+        <div><h2>Factory</h2><label>Daily target<input id="dailyTarget" type="number" min="1" max="200" /></label><label class="check"><input id="autoPublish" type="checkbox" /> Tự publish khi tới lịch</label><button class="btn primary" id="saveSettings">Lưu settings</button></div>
+        <div><h2>Runtime</h2><dl id="runtimeInfo"></dl></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><h2>9Router / LLM</h2><p class="muted-text">Model thực tế được lấy từ <code>/v1/models</code>. Preset 3.5/3.6 có thể đổi ID bằng ENV.</p></div><span id="routerStatus" class="badge muted">NOT TESTED</span></div>
+        <div class="llm-grid">
+          <label>Model dùng để viết script<select id="llmModel"></select></label>
+          <label>Page profile để test video<select id="testPage"></select></label>
+        </div>
+        <div class="controls left">
+          <button class="mini" id="refreshModels">↻ Refresh models</button>
+          <button class="btn primary" id="testLLMBtn">⚡ Test LLM</button>
+          <button class="btn success" id="settingsTestVideoBtn">🎬 Tạo 1 video test</button>
+        </div>
+        <div id="llmTestResult" class="test-result muted-text">Chưa test.</div>
+      </section>
+
+      <section class="panel"><h2>API keys</h2><p>Điền key trong <code>.env</code>. Dashboard chỉ hiển thị trạng thái cấu hình, không trả secret ra trình duyệt.</p><pre>NINEROUTER_BASE_URL=http://127.0.0.1:20128/v1
+NINEROUTER_API_KEY=sk-9router-...
+NINEROUTER_DEFAULT_MODEL=cx/gpt-5.4
+NINEROUTER_MODEL_GEMINI_31=vertex/gemini-3.1-pro-preview
+NINEROUTER_MODEL_GEMINI_35=gemini-3.5
+NINEROUTER_MODEL_GEMINI_36=gemini-3.6
+NINEROUTER_MODEL_GPT_54=cx/gpt-5.4
+NINEROUTER_MODEL_GPT_54_GH=gh/gpt-5.4
+NINEROUTER_MODEL_GPT_55=cx/gpt-5.5
+
+PEXELS_API_KEY=...
+SERPER_API_KEY=...
+FB_PAGE_1_TOKEN=...
+...
+FB_PAGE_10_TOKEN=...</pre></section>
+    </section>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+FLOW CONTENT FACTORY V2 TRIAL
+=============================
+
+1) Chạy run.bat
+2) Nhìn CMD để biết UI port (ưu tiên http://127.0.0.1:8897)
+3) Extension v14.5.4 GIỮ: ws://127.0.0.1:8786/ws
+4) Page Profiles -> tạo Page -> upload PERSONA MASTER -> Save
+5) Factory V2 -> chọn Page -> TEST 1 VIDEO
+6) Test IMAGE_BEAT trước, sau đó IMAGE_TO_VIDEO
+7) Output final hiện trực tiếp trên web, kèm QC score
+8) Facebook: map Page trong Page Profile; Auto Publish mặc định OFF / DRY RUN
+
+TEST KHÔNG CẦN GOOGLE FLOW:
+- CMD 1: run.bat
+- CMD 2: run_fake_agent.bat
+- Fake agent mô phỏng cả IMAGE_BEAT và IMAGE_TO_VIDEO để test server/UI/FFmpeg/QC.

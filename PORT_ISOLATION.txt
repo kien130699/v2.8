@@ -1,0 +1,17 @@
+V2.8.5.4 ISOLATION CONTRACT
+
+V2.8 HTTP/WS server: 127.0.0.1:3000
+V2.8 Flow WS: ws://127.0.0.1:3000/ws/flow
+V2.8 Edge debug owner: 9224
+
+Other stacks are external and MUST NOT be touched:
+- Edge 9222 / server 8786
+- Edge 9223 / server 8787
+
+The V2.8 extension has localhost host permissions/CSP only for port 3000.
+It does not discover, migrate to, connect to, stop, or inspect 8786/8787/9222/9223.
+
+LLM policy:
+- 9ROUTER_API_KEY is the primary key name.
+- GPT/Gemini calls go through 9ROUTER_BASE_URL (default http://127.0.0.1:20128/v1).
+- No direct OpenAI/Gemini provider key is used by V2.8.

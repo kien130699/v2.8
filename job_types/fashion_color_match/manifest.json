@@ -1,0 +1,76 @@
+{
+  "id": "6",
+  "slug": "fashion_color_match",
+  "name": "Phối Màu Thời Trang (Veo 3 Native Audio)",
+  "engine": "beauty",
+  "description": "Auto sinh video phối màu thời trang đối sánh 2 bạn diễn (Basic vs Sang chảnh). Nhúng trực tiếp lời thoại tiếng Việt vào prompt Veo 3 để sinh video kèm voice và lip-sync native, không cần TTS rời.",
+  "defaults": {
+    "theme": "fashion_color_matrix_dual_model",
+    "top_item": "áo ghi lê cổ V cài nút dáng ôm",
+    "bottom_item": "chân váy lụa suông dài",
+    "studio_backdrop": "in front of an elegant modern white wardrobe closet, soft high-end studio lighting, clean fashion lookbook aesthetic, photorealistic, 8k",
+    "model_left_style": "stylish Vietnamese female fashion model, dynamic energetic posing",
+    "model_right_style": "stylish Vietnamese female fashion model, elegant chic luxury posing",
+    "clip_mode": "3_clips_8s",
+    "video_model": "Veo 3.1 - Fast",
+    "image_model": "Nano Banana 2",
+    "aspect_ratio": "9:16",
+    "language": "vi-VN",
+    "auto_concat": true,
+    "cta_text": "Bấm theo dõi tụi mình liền nha để gom thêm cả rổ mẹo phối đồ đỉnh chóp nghen!"
+  },
+  "schema": {
+    "top_item": {
+      "type": "text",
+      "label": "Mẫu áo trên (Top)"
+    },
+    "bottom_item": {
+      "type": "text",
+      "label": "Mẫu váy/quần dưới (Bottom)"
+    },
+    "studio_backdrop": {
+      "type": "textarea",
+      "label": "Bối cảnh Studio / Background"
+    },
+    "clip_mode": {
+      "type": "select",
+      "label": "Chế độ chia clip",
+      "options": [
+        {
+          "value": "3_clips_8s",
+          "label": "3 Clips x 8s (Chuẩn 24s Veo 3)"
+        },
+        {
+          "value": "6_clips_4s",
+          "label": "6 Clips x 4s (Từng cặp màu đơn)"
+        }
+      ]
+    },
+    "video_model": {
+      "type": "select",
+      "label": "Mô hình Veo Video",
+      "options": [
+        "Veo 3.1 - Fast",
+        "Veo 3.1 - Quality",
+        "Veo 3.1 - Lite"
+      ]
+    },
+    "image_model": {
+      "type": "select",
+      "label": "Mô hình Start Frame",
+      "options": [
+        "Nano Banana 2",
+        "Nano Banana 2 Lite",
+        "Nano Banana Pro"
+      ]
+    },
+    "cta_text": {
+      "type": "text",
+      "label": "Lời thoại kêu gọi (CTA)"
+    },
+    "auto_concat": {
+      "type": "checkbox",
+      "label": "Tự động nối các clip thành Video 24s"
+    }
+  }
+}

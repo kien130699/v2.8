@@ -1,0 +1,150 @@
+{
+  "id": "4",
+  "slug": "shopee_keyword",
+  "name": "Shopee Keyword Auto",
+  "engine": "parenting",
+  "description": "Nhập keyword Shopee → tự tìm sản phẩm → tự đổi affiliate → tự tạo video như Job 3.",
+  "defaults": {
+    "keyword": "đồ chơi xe khủng long",
+    "product_count": 5,
+    "sub_id": "fbpage01",
+    "product_video_mode": "one_product_per_video",
+    "affiliate_required": true,
+    "job_type": "shopee",
+    "template_mode": "shopee",
+    "story_template_id": "auto",
+    "product_reveal_scene": 1,
+    "story_scene_count": 0,
+    "total_dialogue_turns": 0,
+    "output_duration": "random_30_35s",
+    "image_model": "Nano Banana 2",
+    "video_model": "Veo 3.1 - Fast",
+    "video_duration": "8s",
+    "model": "",
+    "burn_subtitles": true,
+    "angle_hint": "Tạo câu chuyện ngắn về sản phẩm Shopee gắn kết Mẹ và Bé, giới thiệu sản phẩm tự nhiên, không quảng cáo lộ liễu.",
+    "force_refresh_product": false
+  },
+  "schema": {
+    "keyword": {
+      "type": "text",
+      "label": "Keyword Shopee"
+    },
+    "product_count": {
+      "type": "number",
+      "label": "Số sản phẩm tự lấy",
+      "min": 1,
+      "max": 5
+    },
+    "sub_id": {
+      "type": "text",
+      "label": "Sub ID affiliate (chữ/số)"
+    },
+    "product_video_mode": {
+      "type": "select",
+      "label": "Chế độ tạo video",
+      "options": [
+        {
+          "value": "one_product_per_video",
+          "label": "Mỗi SP tạo 1 video"
+        },
+        {
+          "value": "multi_product_one_video",
+          "label": "Ghép nhiều SP vào 1 video"
+        }
+      ]
+    },
+    "affiliate_required": {
+      "type": "checkbox",
+      "label": "Bắt buộc có affiliate_url"
+    },
+    "story_template_id": {
+      "type": "select",
+      "label": "Mẫu kể chuyện Shopee",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Tự chọn"
+        },
+        {
+          "value": "direct_demo",
+          "label": "Demo trực tiếp"
+        },
+        {
+          "value": "problem_solution",
+          "label": "Vấn đề → Giải pháp"
+        },
+        {
+          "value": "unbox_play",
+          "label": "Mở hộp / Chơi thử"
+        },
+        {
+          "value": "before_after",
+          "label": "Trước → Sau"
+        },
+        {
+          "value": "mini_challenge",
+          "label": "Thử thách nhỏ"
+        }
+      ]
+    },
+    "output_duration": {
+      "type": "select",
+      "label": "Độ dài output",
+      "options": [
+        "random_30_35s",
+        "30s",
+        "31s",
+        "32s",
+        "33s",
+        "34s",
+        "35s"
+      ]
+    },
+    "image_model": {
+      "type": "select",
+      "label": "Mô hình tạo ảnh",
+      "options": [
+        "Nano Banana 2",
+        "Nano Banana 2 Lite",
+        "Nano Banana Pro"
+      ]
+    },
+    "video_model": {
+      "type": "select",
+      "label": "Mô hình tạo video",
+      "options": [
+        "Veo 3.1 - Fast",
+        "Veo 3.1 - Lite",
+        "Veo 3.1 - Lite [Lower Priority]",
+        "Veo 3.1 - Quality",
+        "Gemini Omni Flash"
+      ]
+    },
+    "video_duration": {
+      "type": "select",
+      "label": "Độ dài clip Flow",
+      "options": [
+        "4s",
+        "6s",
+        "8s"
+      ]
+    },
+    "model": {
+      "type": "text",
+      "label": "Model viết kịch bản (trống = Setting tổng)"
+    },
+    "burn_subtitles": {
+      "type": "checkbox",
+      "label": "Đốt subtitle vào video"
+    },
+    "angle_hint": {
+      "type": "textarea",
+      "label": "Gợi ý góc quay / Story"
+    },
+    "force_refresh_product": {
+      "type": "checkbox",
+      "label": "Refresh dữ liệu sản phẩm"
+    }
+  }
+}

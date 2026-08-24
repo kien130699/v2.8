@@ -1,0 +1,74 @@
+{
+  "id": "7",
+  "slug": "shopee_reviewer",
+  "name": "Shopee Reviewer Pro (KOL / Gia Dụng)",
+  "engine": "beauty",
+  "description": "Tự động sinh video review sản phẩm Shopee phong cách KOL người thật hoặc đối sánh Before/After. Nhúng trực tiếp lời thoại tiếng Việt vào prompt Veo 3 để sinh video kèm voice và lip-sync native.",
+  "defaults": {
+    "product_url": "https://shopee.vn/B%E1%BB%99-C%C3%A2y-Lau-Nh%C3%A0-T%E1%BB%B1-V%E1%BA%AFt-Homepower-BS-03-Ch%E1%BB%95i-Lau-Nh%C3%A0-360-%C4%90%E1%BB%99-Si%C3%AAu-M%E1%BB%8Fng-4-H%E1%BB%87-Th%E1%BB%91ng-L%C3%A0m-S%E1%BA%A1ch-M%E1%BB%9Bi-i.86429796.25159024209",
+    "product_name": "Bộ Cây Lau Nhà Tự Vắt Homepower BS-03",
+    "review_style": "kol_real_human",
+    "scene_count": 3,
+    "video_model": "Veo 3.1 - Fast",
+    "image_model": "Nano Banana 2",
+    "aspect_ratio": "9:16",
+    "language": "vi-VN",
+    "auto_concat": true,
+    "cta_text": "Link mua chính hãng mình để ngay dưới phần bình luận nha cả nhà ơi!"
+  },
+  "schema": {
+    "product_name": {
+      "type": "text",
+      "label": "Tên sản phẩm"
+    },
+    "product_url": {
+      "type": "text",
+      "label": "Đường link Shopee"
+    },
+    "review_style": {
+      "type": "select",
+      "label": "Phong cách Review",
+      "options": [
+        {
+          "value": "kol_real_human",
+          "label": "Nữ KOL Nhà Đẹp (Người thật 8K)"
+        },
+        {
+          "value": "before_after_vs",
+          "label": "So Sánh Đối Sánh (Cũ vs Mới)"
+        },
+        {
+          "value": "direct_unbox_test",
+          "label": "Mở Hộp & Test Công Năng Cực Mạnh"
+        }
+      ]
+    },
+    "scene_count": {
+      "type": "number",
+      "label": "Số cảnh (Mỗi cảnh 8s)",
+      "min": 2,
+      "max": 4
+    },
+    "video_model": {
+      "type": "select",
+      "label": "Mô hình Video",
+      "options": [
+        "Veo 3.1 - Fast",
+        "Veo 3.1 - Quality",
+        "Gemini Omni Flash"
+      ]
+    },
+    "image_model": {
+      "type": "select",
+      "label": "Mô hình Ảnh",
+      "options": [
+        "Nano Banana 2",
+        "Nano Banana Pro"
+      ]
+    },
+    "cta_text": {
+      "type": "textarea",
+      "label": "Lời kêu gọi hành động (CTA)"
+    }
+  }
+}

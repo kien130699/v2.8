@@ -1,0 +1,69 @@
+{
+  "version": "2.6",
+  "title": "ng-c-thay-i-ng-i-kh-ng-mu-n-thay-i",
+  "voice_duration": 19.584,
+  "total_duration_expected": 19.584,
+  "tts_provider": "edge_zh",
+  "narration_language": "zh-CN",
+  "subtitle_language": "vi-VN",
+  "tts_voice": "zh-CN-YunxiNeural",
+  "celebrity": {
+    "name": "Warren Buffett",
+    "file": "D:\\YT\\Code\\V2.8_Facebook_Job_Factory\\modules\\facebook\\engine_v27\\input\\celebrity_verified_v26\\warren_buffett\\google_warren_buffett_olmRW_91rHw.mp4",
+    "start_time": 55.172,
+    "duration": 4.185,
+    "audio_mode": "visual_only",
+    "source_mode": "search",
+    "signature": "D:\\YT\\Code\\V2.8_Facebook_Job_Factory\\modules\\facebook\\engine_v27\\input\\celebrity_verified_v26\\warren_buffett\\google_warren_buffett_olmRW_91rHw.mp4|55.0|4.0",
+    "source_meta": {
+      "provider": "ytsearch",
+      "google_result": {
+        "provider": "ytsearch",
+        "title": "CNBC's Interview with Warren Buffett July 15th 2026 (1080p HD)",
+        "link": "https://www.youtube.com/watch?v=olmRW_91rHw",
+        "snippet": "After downing his third Cherry Coke of the morning (On Camera, Berkshire owns the company), 95-year-old Warren Buffett ...",
+        "channel": "David Blackwell",
+        "duration_text": "",
+        "position": 2,
+        "image_url": ""
+      },
+      "source_url": "https://www.youtube.com/watch?v=olmRW_91rHw",
+      "title": "CNBC's Interview with Warren Buffett July 15th 2026 (1080p HD)",
+      "uploader": "David Blackwell",
+      "webpage_url": "https://www.youtube.com/watch?v=olmRW_91rHw",
+      "duration": 3596,
+      "extractor": "Youtube",
+      "note": "Original celebrity audio is forcibly muted by V2.4 renderer. Verify reuse rights for your use case."
+    }
+  },
+  "stock_sources": [
+    {
+      "scene": 1,
+      "query": "city night aerial drone traffic cinematic moving lights",
+      "provider": "pexels",
+      "id": "pexels:28698224",
+      "download_url": "https://videos.pexels.com/video-files/28698224/12454392_1080_1920_50fps.mp4",
+      "source_page": "https://www.pexels.com/video/buyuk-kavsak-ve-cadde-28698224/",
+      "creator": "Furkan Özavcı",
+      "width": 1080,
+      "height": 1920,
+      "duration": 20,
+      "motion_score": 8.315,
+      "start_time": 6.44
+    },
+    {
+      "scene": 2,
+      "query": "modern city night aerial drone traffic timelapse cinematic",
+      "provider": "pexels",
+      "id": "pexels:11372919",
+      "download_url": "https://videos.pexels.com/video-files/11372919/11372919-hd_1080_1920_60fps.mp4",
+      "source_page": "https://www.pexels.com/video/traffic-on-highway-at-night-11372919/",
+      "creator": "Altaf Shah",
+      "width": 1080,
+      "height": 1920,
+      "duration": 56,
+      "motion_score": 17.547,
+      "start_time": 0.0
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+﻿[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,58,&H00FFFFFF,&H00FFFFFF,&H00000000,&H70000000,-1,0,0,0,100,100,0,0,3,12,0,5,70,70,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:02.20,Default,,0,0,0,,Đừng lãng phí thời gian cố gắng
+Dialogue: 0,0:00:02.20,0:00:03.48,Default,,0,0,0,,thay đổi một người
+Dialogue: 0,0:00:03.48,0:00:04.90,Default,,0,0,0,,không muốn thay đổi.
+Dialogue: 0,0:00:04.90,0:00:07.33,Default,,0,0,0,,Sự thay đổi thật sự chỉ xảy
+Dialogue: 0,0:00:07.33,0:00:10.03,Default,,0,0,0,,ra khi chính họ muốn thay đổi.
+Dialogue: 0,0:00:10.03,0:00:11.78,Default,,0,0,0,,Càng cố kiểm soát người khác,
+Dialogue: 0,0:00:11.78,0:00:13.47,Default,,0,0,0,,bạn càng dễ đánh mất sự bình
+Dialogue: 0,0:00:13.47,0:00:14.26,Default,,0,0,0,,yên của mình.
+Dialogue: 0,0:00:14.26,0:00:16.52,Default,,0,0,0,,Hãy thu năng lượng về cho chính
+Dialogue: 0,0:00:16.52,0:00:18.71,Default,,0,0,0,,mình, lúc đó cuộc đời mới thật
+Dialogue: 0,0:00:18.71,0:00:19.58,Default,,0,0,0,,sự tiến lên.

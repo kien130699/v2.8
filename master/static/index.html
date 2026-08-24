@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>V2.8 Nhà máy Job Facebook</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="/static/style.css?v=2885"/>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand"><span class="brand-mark">28</span><span class="brand-text">V2.8 Factory</span></div>
+    </div>
+    <div class="topbar-center" id="statusBar">
+      <div class="status-item" id="flowStatusItem" title="Flow Extension">
+        <span class="status-dot" id="flowDot"></span>
+        <span class="status-label">Flow: <b id="flowText">Dang ket noi...</b></span>
+      </div>
+      <div class="status-item" id="shopeeStatusItem" title="Shopee Session">
+        <span class="status-dot" id="shopeeDot"></span>
+        <span class="status-label">Shopee: <b id="shopeeText">Kiem tra...</b></span>
+      </div>
+      <div class="status-item" id="diskStatusItem" title="Disk Space">
+        <span class="status-dot" id="diskDot"></span>
+        <span class="status-label">Disk: <b id="diskText">-</b></span>
+      </div>
+      <div class="status-item" id="fbTokenStatusItem" title="Facebook Token">
+        <span class="status-dot" id="fbTokenDot"></span>
+        <span class="status-label">FB: <b id="fbTokenText">-</b></span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn ghost" id="refreshBtn" title="Lam moi">Refresh</button>
+      <button class="btn" id="testAllBtn" title="Test tat ca Job">Test All</button>
+      <button class="btn primary" id="newJobBtn">+ Tao Job</button>
+    </div>
+  </header>
+
+  <div class="main-wrap">
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidenav" id="sidenav">
+        <button class="nav-btn active" data-view="dashboard">◫ <span>Tổng quan</span></button>
+        <button class="nav-btn" data-view="jobs">⚡ <span>Quản lý Job</span></button>
+        <button class="nav-btn" data-view="facebook">f <span>Facebook</span></button>
+        <button class="nav-btn" data-view="shopee">S <span>Shopee Research</span></button>
+        <button class="nav-btn" data-view="runs">▶ <span>Lần chạy & output</span></button>
+        <button class="nav-btn" data-view="flow">⚙ <span>Cài đặt Flow</span></button>
+        <button class="nav-btn" data-view="logs">≡ <span>Nhật ký</span></button>
+      </nav>
+      <div class="side-foot">
+        <small>V2.8.6.0 | Server :3000 | 9Router only</small>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <section id="view-dashboard" class="view active" data-view="dashboard">
+        <div class="view-header">
+          <div><h1>Tong quan</h1><p>3 loai Job, 1 hang doi Flow, 1 publish queue Facebook.</p></div>
+          <div class="header-actions">
+            <button class="btn ghost" id="dashRefresh">Refresh</button>
+            <button class="btn primary" id="dashNewJob">+ Job moi</button>
+          </div>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-head"><h2>Job gan day</h2><a class="btn small" data-go="jobs">Xem tat ca</a></div>
+            <div class="job-list-compact" id="dashJobs"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Flow Worker</h2><a class="btn small" data-go="flow">Cai dat</a></div>
+            <div id="dashFlow"></div>
+          </section>
+        </div>
+        <section class="panel">
+          <div class="panel-head"><h2>Run gan day</h2><a class="btn small" data-go="runs">Xem tat ca</a></div>
+          <div class="table-wrap" id="dashRuns"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Hoat dong gan day</h2></div>
+          <div class="activity-feed" id="activityFeed"></div>
+        </section>
+      </section>
+
+      <section id="view-jobs" class="view" data-view="jobs">
+        <div class="view-header">
+          <div><h1>Quan ly Job</h1><p>Template - Instance (1.1, 1.2...). Clone giu cau hinh + Page.</p></div>
+          <button class="btn primary" id="jobsNewBtn">+ Tao Job</button>
+        </div>
+        <div class="toolbar">
+          <div class="seg" id="templateFilters"></div>
+          <div class="toolbar-right">
+            <button class="btn" id="jobsCloneAll">Clone tat ca</button>
+          </div>
+        </div>
+        <div class="jobs-grid" id="jobsGrid"></div>
+      </section>
+
+      <section id="view-facebook" class="view" data-view="facebook">
+        <div class="view-header">
+          <div><h1>Facebook Pages</h1><p>Import token 1 lan. Token luu local SQLite.</p></div>
+        </div>
+        <div class="fb-grid">
+          <section class="panel sticky-panel">
+            <h2>Nhap Token</h2>
+            <label class="field"><span>User/Page Token</span><textarea id="fbToken" rows="4" placeholder="EAAB..."></textarea></label>
+            <button class="btn primary full" id="fbImportBtn">Nhap & Lay Page</button>
+            <details class="mt-3"><summary>Them Page thu cong</summary>
+              <div class="mini-form">
+                <input id="manualPageId" placeholder="Page ID">
+                <input id="manualPageName" placeholder="Ten Page">
+                <textarea id="manualPageToken" rows="3" placeholder="Page Access Token"></textarea>
+                <button class="btn" id="manualSaveBtn">Luu Page</button>
+              </div>
+            </details>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Danh sach Page</h2><button class="btn small" id="fbTestAllBtn">Test tat ca</button></div>
+            <div class="page-list" id="fbPages"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="view-shopee" class="view" data-view="shopee">
+        <div class="view-header">
+          <div><h1>Shopee Research &amp; Affiliate</h1><p>Tim san pham - Chon vao Basket - Doi Affiliate - Tao Job Video</p></div>
+          <button class="btn ghost" id="shopeeCheckSession">Kiem tra Session</button>
+        </div>
+        <div class="shopee-grid">
+          <section class="panel sticky-panel">
+            <h2>Tim san pham</h2>
+            <div class="row">
+              <label class="field"><span>Keyword</span><input id="shopeeKeyword" placeholder="do choi xe khung long"></label>
+              <label class="field"><span>So SP</span><input id="shopeeCount" type="number" min="1" max="30" value="10"></label>
+            </div>
+            <button class="btn primary full" id="shopeeSearchBtn">Tim san pham Shopee</button>
+            <div class="row-actions mt-2">
+              <button class="btn" id="shopeeAddSelectedBtn">Them da chon vao Basket</button>
+              <button class="btn danger" id="shopeeClearBasketBtn">Xoa Basket</button>
+            </div>
+            <p class="note">UI tieng Viet. Prompt Flow dung tieng Anh. Caption/Facebook dung affiliate_url.</p>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Basket (<span id="basketCount">0</span> SP)</h2><button class="btn small" id="basketCopyBtn">Copy JSON</button></div>
+            <div class="row">
+              <label class="field"><span>Chế độ tạo video</span>
+                <select id="basketMode">
+                  <option value="one_product_per_video">Moi SP -> 1 video</option>
+                  <option value="multi_product_one_video">Nhieu SP -> 1 video</option>
+                </select>
+              </label>
+              <label class="field"><span>Sub ID</span><input id="affiliateSubId" placeholder="fbpage01"></label>
+            </div>
+            <button class="btn primary full" id="affiliateConvertBtn">Doi Affiliate Link (1-5 link/lan)</button>
+            <div class="product-list" id="shopeeBasket"></div>
+          </section>
+        </div>
+        <section class="panel">
+          <h2>Ket qua tim kiem</h2>
+          <div class="product-list" id="shopeeResults"></div>
+        </section>
+      </section>
+
+      <section id="view-runs" class="view" data-view="runs">
+        <div class="view-header">
+          <div><h1>Lan chay &amp; Output</h1><p>Video render + trang thai publish tung Page.</p></div>
+          <div class="header-actions">
+            <button class="btn ghost" id="runsRefresh">Refresh</button>
+            <button class="btn" id="runsClearOld">Don run cu (&gt;30 ngay)</button>
+          </div>
+        </div>
+        <section class="panel">
+          <div class="table-wrap" id="runsTable"></div>
+        </section>
+      </section>
+
+      <section id="view-flow" class="view" data-view="flow">
+        <div class="view-header">
+          <div><h1>Flow Worker &amp; Settings</h1><p>WebSocket duy nhat: ws://127.0.0.1:3000/ws/flow</p></div>
+        </div>
+        <div class="grid two">
+          <section class="panel">
+            <h2>Trang thai Extension</h2>
+            <div id="flowStatus"></div>
+            <div class="row-actions mt-3">
+              <button class="btn danger" data-flow-action="clear_queue">Xoa hang doi</button>
+              <button class="btn" data-flow-action="clear_prompt">Xoa prompt</button>
+              <button class="btn" data-flow-action="clear_images">Xoa anh</button>
+              <button class="btn" data-flow-action="clear_composer">Xoa khung nhap</button>
+              <button class="btn small ghost" id="pruneMediaBtn">Don video tam (&gt;7 ngay)</button>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Hang doi Flow</h2>
+            <div class="table-wrap" id="flowQueue"></div>
+          </section>
+        </div>
+        <section class="panel">
+          <h2>Cai dat Flow (Global)</h2>
+          <div id="flowSettings" class="form-grid"></div>
+          <button class="btn primary mt-3" id="saveFlowBtn">Luu cai dat Flow</button>
+        </section>
+      </section>
+
+      <section id="view-logs" class="view" data-view="logs">
+        <div class="view-header">
+          <div><h1>Nhat ky he thong</h1><p>Tach biet Server logs &amp; Extension logs.</p></div>
+        </div>
+        <section class="panel">
+          <div class="header-actions">
+            <div class="seg" id="logFilterSeg">
+              <button class="active" data-log-filter="all">Tat ca</button>
+              <button data-log-filter="server">Server</button>
+              <button data-log-filter="extension">Extension</button>
+            </div>
+            <button class="btn small" id="copyServerLogsBtn">Copy Server</button>
+            <button class="btn small" id="copyExtLogsBtn">Copy Extension</button>
+            <button class="btn small primary" id="copyAllLogsBtn">Copy ca 2</button>
+            <button class="btn small" id="logsRefresh">Refresh</button>
+          </div>
+          <div class="logs" id="logsBox"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div><h2 id="modalTitle">Job</h2><p id="modalSub"></p></div>
+        <button class="icon-btn" id="modalClose">x</button>
+      </div>
+      <div id="modalBody"></div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="modalCancel">Huy</button>
+        <button class="btn primary" id="modalSave">Luu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/app.js?v=2885"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "provider": "google_serper_video",
+  "google_result": {
+    "provider": "google_serper_video",
+    "title": "Jack Ma and Elon Musk hold debate in Shanghai",
+    "link": "https://www.youtube.com/watch?v=f3lUEnMaiAU",
+    "snippet": "People :You need to be smart to become a billionaire. Jack ma:Hold my brain. Lmao it's a joke .",
+    "channel": "New China TV",
+    "duration_text": "46:53",
+    "date": "Aug 29, 2019",
+    "position": 3,
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAkFL3xkGRmvSUFnnvLFwLMAOKqHW-20R-l9EGzpWygGNRALlePJ8WDw&s"
+  },
+  "source_url": "https://www.youtube.com/watch?v=f3lUEnMaiAU",
+  "title": "Jack Ma and Elon Musk hold debate in Shanghai",
+  "uploader": "New China TV",
+  "webpage_url": "https://www.youtube.com/watch?v=f3lUEnMaiAU",
+  "duration": 2812,
+  "extractor": "Youtube",
+  "note": "Original celebrity audio is forcibly muted by V2.4 renderer. Verify reuse rights for your use case."
+}

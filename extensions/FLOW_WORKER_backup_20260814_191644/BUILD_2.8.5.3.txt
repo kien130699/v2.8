@@ -1,0 +1,4 @@
+FLOW_WORKER 14.6.9
+V2.8 build 2.8.5.3
+Required WS: ws://127.0.0.1:3000/ws/flow
+If Chrome still shows 14.6.7, remove/disable the old unpacked extension and Load unpacked THIS folder.

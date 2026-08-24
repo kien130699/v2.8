@@ -1,0 +1,20 @@
+V12.2 PIPELINE
+
+BOOTSTRAP
+active tab
+ -> ensure Flow tool URL
+ -> inject page bridge
+ -> attach debugger
+ -> if no projectId: trusted click Create/New Project and wait /flow/project/<id>
+ -> re-inject page bridge
+ -> trusted click All Media
+
+SCHEDULER
+IMAGE pending -> IMAGE submit queue -> single dispatcher -> IMAGE inflight (max 9)
+IMAGE success -> exact imageMediaId + Flow generated title -> VIDEO ready queue
+VIDEO ready -> VIDEO submit queue -> single dispatcher -> exact Ingredient mediaId -> VIDEO inflight (max 3)
+VIDEO SUCCESSFUL -> optional auto-download
+
+SEARCH
+Search assets uses exactly Flow generated title/prompt (trim only).
+No forced punctuation. Exact imageMediaId remains the final selection key.
