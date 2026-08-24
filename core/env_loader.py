@@ -161,7 +161,16 @@ def resolve_env_snapshot(keys: Iterable[str] | None = None) -> dict[str, str]:
 
 
 def load_project_env(keys: Iterable[str] | None = None) -> dict[str, str]:
-    """Resolve V2.8 env and mirror non-empty results into os.environ."""
+    """Ensure process env is loaded from authoritative files once per process."""
+    import sys
+    if sys.platform == "win32":
+        try:
+            if hasattr(sys.stdout, "reconfigure"):
+                sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            if hasattr(sys.stderr, "reconfigure"):
+                sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
     if keys is None:
         # Load every key present in local env files plus shared legacy/discovery keys.
         all_keys: set[str] = set(_DISCOVER_KEYS)
