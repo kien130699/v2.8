@@ -238,6 +238,15 @@ class SequentialTester:
             self.log("INIT", f"Server không phản hồi tại {self.base_url}", level="ERROR")
             return {"ok": False, "error": "server unreachable"}
 
+        # Cleanup stale/running runs from previous tests
+        active_runs = request_json("GET", f"{self.base_url}/api/runs?limit=20")
+        if isinstance(active_runs, list):
+            for r in active_runs:
+                if r.get("status") in {"queued", "waiting_flow", "waiting_engine", "preparing", "running", "dispatching"}:
+                    self.log("INIT", f"Dọn dẹp run cũ trước khi test: {r['id']} ({r.get('status')})")
+                    request_json("POST", f"{self.base_url}/api/runs/{r['id']}/cancel")
+            time.sleep(1.0)
+
         templates = request_json("GET", f"{self.base_url}/api/job-templates")
         if not templates or not isinstance(templates, list):
             self.log("INIT", "Không lấy được danh sách templates", level="ERROR")
