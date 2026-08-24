@@ -1019,22 +1019,11 @@ async function runServerQueueLoop(){
     const signature=serverFlowSignature(first?.flow||{});
     const initial=[first,...takeQueuedServerJobs(signature)];
     try{
-      const tab=await ensureFlowToolTab();
-      assertServerAutomationAllowed('server tab verify');
-      if(!tab?.id) throw new Error('Không tạo/tìm được Google Flow tab.');
-      const flow=first?.flow||{};
-      await runServerBatchJob(tab.id,signature,initial,flow);
+      await runServerJobGroup(initial,signature);
     }catch(error){
-      const errText=error?.message||String(error);
-      const fatalCircuit=isFatalFlowUiError(error);
-      if(fatalCircuit){
-        tripFlowUiCircuit(error);
-      }
-      for(const item of initial){
-        const jId=String(item?.jobId||'');
-        sendServerMessage({type:'FLOW_JOB_RESULT',jobId:jId,ok:false,error:errText});
-        serverAcceptedJobIds.delete(jId);
-      }
+      if(!serverAutomationAllowed) throw error;
+      await appendLog(`SERVER JOB GROUP lỗi · sẽ tiếp tục queue sau 2s · ${error?.message||error}`,'error');
+      await sleep(2000);
     }
   }
 }
