@@ -24,6 +24,48 @@ ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = ROOT / "data" / "v28.sqlite3"
 
 
+import uuid
+from io import BytesIO
+from PIL import Image
+
+def upload_persona_asset(base_url: str, instance_id: str, field_name: str = "persona_path") -> dict[str, Any]:
+    # Find existing asset or generate dummy
+    candidates = [
+        ROOT / "data" / "job_assets" / "2_1" / "persona_path.png",
+        ROOT / "data" / "review" / "job2_scene1.jpg",
+    ]
+    file_bytes = None
+    filename = "persona.jpg"
+    for c in candidates:
+        if c.exists() and c.stat().st_size > 1024:
+            file_bytes = c.read_bytes()
+            filename = c.name
+            break
+    if not file_bytes:
+        im = Image.new("RGB", (512, 768), color=(220, 180, 160))
+        buf = BytesIO()
+        im.save(buf, format="JPEG")
+        file_bytes = buf.getvalue()
+        filename = "persona.jpg"
+
+    url = f"{base_url}/api/jobs/{instance_id}/assets/{field_name}"
+    boundary = "----WebKitFormBoundary" + uuid.uuid4().hex[:16]
+    body = bytearray()
+    body.extend(f"--{boundary}\r\n".encode("utf-8"))
+    body.extend(f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'.encode("utf-8"))
+    body.extend(b"Content-Type: image/jpeg\r\n\r\n")
+    body.extend(file_bytes)
+    body.extend(f"\r\n--{boundary}--\r\n".encode("utf-8"))
+
+    headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
+    req = urllib.request.Request(url, data=bytes(body), headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as res:
+            return json.loads(res.read().decode("utf-8"))
+    except Exception as exc:
+        return {"_error": str(exc)}
+
+
 def request_json(method: str, url: str, payload: dict[str, Any] | None = None, timeout: float = 30.0) -> dict[str, Any]:
     headers = {"Content-Type": "application/json", "Accept": "application/json"}
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
@@ -122,6 +164,11 @@ class SequentialTester:
 
         instance_id = str(create_res.get("job", {}).get("id") or "")
         self.log(f"JOB-{seq:02d}", f"Đã tạo Instance ID: {instance_id}")
+
+        # Auto-attach persona asset if required by template
+        if template_id in {"2", "5"}:
+            up_res = upload_persona_asset(self.base_url, instance_id, "persona_path")
+            self.log(f"JOB-{seq:02d}", f"Đã import Persona sample: {up_res.get('ok', False)}")
 
         # Step 2: RUN INSTANCE (POST /api/jobs/{instance_id}/run)
         run_res = request_json("POST", f"{self.base_url}/api/jobs/{instance_id}/run", {"trigger": f"seq-test-{seq}"})
@@ -234,7 +281,7 @@ class SequentialTester:
             name = r.get("name") or "Unknown"
             st = r.get("lastStatus") or r.get("status") or "FAILED"
             el = r.get("elapsedSec") if r.get("elapsedSec") is not None else 0
-            badge = "✅" if st in {"completed", "done", "published", "dry_run_ok", "cancelled", "waiting_flow", "queued"} else "❌"
+            badge = "✅" if st in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled", "waiting_flow", "queued"} else "❌"
             txt_lines.append(f"Job {seq:02d} | {name:<35} | {badge} {str(st):<15} | {el}s")
         txt_lines.append(f"=======================================================\n")
         txt_content = "\n".join(txt_lines)
