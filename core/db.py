@@ -426,21 +426,57 @@ def save_scene_checkpoint(job_id: str, scene_index: int, *, run_id: str | None =
                    job_id = COALESCE(excluded.job_id, scene_checkpoints.job_id),
                    scene_index = COALESCE(excluded.scene_index, scene_checkpoints.scene_index),
                    scene_id = COALESCE(excluded.scene_id, scene_checkpoints.scene_id),
-                   image_media_id = COALESCE(excluded.image_media_id, scene_checkpoints.image_media_id),
-                   video_media_id = COALESCE(excluded.video_media_id, scene_checkpoints.video_media_id),
-                   local_path = COALESCE(excluded.local_path, scene_checkpoints.local_path),
-                   output_path = COALESCE(excluded.output_path, scene_checkpoints.output_path),
+                   image_media_id = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.image_media_id
+                       ELSE COALESCE(excluded.image_media_id, scene_checkpoints.image_media_id)
+                   END,
+                   video_media_id = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.video_media_id
+                       ELSE COALESCE(excluded.video_media_id, scene_checkpoints.video_media_id)
+                   END,
+                   local_path = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.local_path
+                       WHEN excluded.local_path != '' THEN excluded.local_path
+                       ELSE scene_checkpoints.local_path
+                   END,
+                   output_path = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.output_path
+                       WHEN excluded.output_path != '' THEN excluded.output_path
+                       ELSE scene_checkpoints.output_path
+                   END,
                    status = CASE
+                       -- 1. Stale event from older generation -> REJECT entirely
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.status
+                       -- 2. Newer generation -> ACCEPT new generation status
+                       WHEN CAST(excluded.attempt_id AS INTEGER) > CAST(scene_checkpoints.attempt_id AS INTEGER) THEN excluded.status
+                       -- 3. Same generation -> Monotonic state rank
                        WHEN scene_checkpoints.status IN ('done','completed','ready','DOWNLOADED','DONE') AND excluded.status IN ('pending','running','queued','NOT_STARTED','RUNNING','SUBMITTED') THEN scene_checkpoints.status
-                       WHEN scene_checkpoints.status IN ('failed','FAILED') AND excluded.status IN ('pending','running','queued','NOT_STARTED','RUNNING') AND excluded.attempt_id = scene_checkpoints.attempt_id THEN scene_checkpoints.status
+                       WHEN scene_checkpoints.status IN ('failed','FAILED') AND excluded.status IN ('pending','running','queued','NOT_STARTED','RUNNING') THEN scene_checkpoints.status
                        ELSE excluded.status
                    END,
-                   progress = MAX(excluded.progress, scene_checkpoints.progress),
+                   progress = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.progress
+                       WHEN CAST(excluded.attempt_id AS INTEGER) > CAST(scene_checkpoints.attempt_id AS INTEGER) THEN excluded.progress
+                       ELSE MAX(excluded.progress, scene_checkpoints.progress)
+                   END,
                    attempts = scene_checkpoints.attempts + CASE WHEN excluded.status IN ('retry','RETRY') THEN 1 ELSE 0 END,
-                   attempt_id = excluded.attempt_id,
-                   last_error = excluded.last_error,
-                   payload_json = CASE WHEN excluded.payload_json != '{}' THEN excluded.payload_json ELSE scene_checkpoints.payload_json END,
-                   updated_at = excluded.updated_at
+                   attempt_id = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.attempt_id
+                       ELSE excluded.attempt_id
+                   END,
+                   last_error = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.last_error
+                       ELSE excluded.last_error
+                   END,
+                   payload_json = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.payload_json
+                       WHEN excluded.payload_json != '{}' THEN excluded.payload_json
+                       ELSE scene_checkpoints.payload_json
+                   END,
+                   updated_at = CASE
+                       WHEN CAST(excluded.attempt_id AS INTEGER) < CAST(scene_checkpoints.attempt_id AS INTEGER) THEN scene_checkpoints.updated_at
+                       ELSE excluded.updated_at
+                   END
             """,
             (sc_uid, str(actual_run_id), str(job_id), scene_key, int(scene_index), int(scene_id), media_type, str(status),
              local_path or "", local_path or "", int(progress), 0, str(attempt_id), str(error or "")[:2000], dumps(payload or {}), ts, ts)

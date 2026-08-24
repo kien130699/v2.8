@@ -1138,9 +1138,14 @@ async function connectServerBridge(force=false){
     }
     if(message?.type==='CANCEL_JOB'){
       const targetJobId = String(message?.jobId || '');
+      const targetRunId = message?.runId ? String(message.runId) : null;
       const targetAttemptId = message?.attemptId ? String(message.attemptId) : null;
       const currentJobId = String(runtimeCache?.serverJobId || '');
+      const currentRunId = runtimeCache?.runId ? String(runtimeCache.runId) : null;
       const currentAttemptId = runtimeCache?.attemptId ? String(runtimeCache.attemptId) : null;
+      if(targetRunId && currentRunId && targetRunId !== currentRunId){
+        return;
+      }
       if(targetAttemptId && currentAttemptId && targetAttemptId !== currentAttemptId){
         return;
       }

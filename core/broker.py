@@ -193,6 +193,18 @@ class QueueItem:
     def job_id(self) -> str:
         return str(self.message.get("jobId") or "")
 
+    @property
+    def run_id(self) -> str:
+        return str(self.message.get("runId") or self.message.get("run_id") or "")
+
+    @property
+    def attempt_id(self) -> str:
+        return str(self.message.get("attemptId") or self.message.get("attempt_id") or self.message.get("attempt") or "0")
+
+    @property
+    def queue_key(self) -> tuple[str, str, str, str]:
+        return (self.source, self.run_id, self.attempt_id, self.job_id)
+
 
 class FlowBroker:
     """One central queue in front of exactly one Chrome Flow extension."""
@@ -227,7 +239,8 @@ class FlowBroker:
     @staticmethod
     def _snap(x: QueueItem) -> dict[str, Any]:
         return {
-            "queueId": x.queue_id, "jobId": x.job_id, "source": x.source, "status": x.status,
+            "queueId": x.queue_id, "jobId": x.job_id, "runId": x.run_id, "attemptId": x.attempt_id,
+            "source": x.source, "status": x.status,
             "enqueuedAt": x.enqueued_at, "startedAt": x.started_at, "finishedAt": x.finished_at,
             "result": x.result,
         }
@@ -276,14 +289,19 @@ class FlowBroker:
 
     def enqueue(self, source: str, msg: dict[str, Any]) -> QueueItem:
         jid = str(msg.get("jobId") or "")
+        rid = str(msg.get("runId") or msg.get("run_id") or "")
+        aid = str(msg.get("attemptId") or msg.get("attempt_id") or msg.get("attempt") or "0")
         for x in list(self.pending) + ([self.active] if self.active else []):
-            if x and x.source == source and jid and x.job_id == jid:
+            if x and x.source == source and (
+                (rid and x.run_id == rid and x.attempt_id == aid and x.job_id == jid) or
+                (not rid and jid and x.job_id == jid)
+            ):
                 return x
         x = QueueItem(uuid.uuid4().hex[:12], source, dict(msg), time.time())
         self.pending.append(x)
         if jid:
             self.job_routes[jid] = source
-        db.log_event(f"Flow enqueue {source}/{jid}", kind="flow", payload={"source": source, "job_id": jid})
+        db.log_event(f"Flow enqueue {source}/{jid} (run={rid} attempt={aid})", kind="flow", payload={"source": source, "job_id": jid, "run_id": rid, "attempt_id": aid})
         self.event.set()
         return x
 
@@ -705,6 +723,8 @@ class FlowBroker:
         if typ == "SCENE_CHECKPOINT":
             self.active_last_progress_at = time.time()
             jid = str(msg.get("jobId") or "")
+            rid = str(msg.get("runId") or (self.active.run_id if self.active and self.active.job_id == jid else jid))
+            aid = str(msg.get("attemptId") or (self.active.attempt_id if self.active and self.active.job_id == jid else "0"))
             sidx = int(msg.get("sceneIndex") or 0)
             sid = int(msg.get("sceneId") or sidx + 1)
             imid = msg.get("imageMediaId")
@@ -712,22 +732,26 @@ class FlowBroker:
             status = str(msg.get("status") or "RUNNING")
             prog = int(msg.get("progress") or 0)
             err = msg.get("error")
-            db.save_scene_checkpoint(jid, sidx, scene_id=sid, image_media_id=imid,
+            db.save_scene_checkpoint(jid, sidx, run_id=rid, attempt_id=aid, scene_id=sid, image_media_id=imid,
                                      video_media_id=vmid, status=status, progress=prog, error=err, payload=msg)
             return
         if typ == "MEDIA_ID_TRACKED":
             self.active_last_progress_at = time.time()
             jid = str(msg.get("jobId") or "")
+            rid = str(msg.get("runId") or (self.active.run_id if self.active and self.active.job_id == jid else jid))
+            aid = str(msg.get("attemptId") or (self.active.attempt_id if self.active and self.active.job_id == jid else "0"))
             sid = int(msg.get("sceneId") or 1)
             sidx = int(msg.get("sceneIndex") or (sid - 1))
             mid = str(msg.get("mediaId") or "")
             title = str(msg.get("title") or "")
             db.log_event(f"Ghi nhận mediaId Scene {sid} ({mid[:16]}…)", level="INFO", kind="flow")
-            db.save_scene_checkpoint(jid, sidx, scene_id=sid, video_media_id=mid, status="VIDEO_PENDING")
+            db.save_scene_checkpoint(jid, sidx, run_id=rid, attempt_id=aid, scene_id=sid, video_media_id=mid, status="VIDEO_PENDING")
             return
         if typ == "VIDEO_FILE_READY":
             self.active_last_progress_at = time.time()
             jid = str(msg.get("jobId") or "")
+            rid = str(msg.get("runId") or (self.active.run_id if self.active and self.active.job_id == jid else jid))
+            aid = str(msg.get("attemptId") or (self.active.attempt_id if self.active and self.active.job_id == jid else "0"))
             sid = int(msg.get("sceneId") or 1)
             mid = str(msg.get("mediaId") or "")
             src_path = str(msg.get("localPath") or "")
@@ -753,7 +777,7 @@ class FlowBroker:
                     print(f"[BROKER] Saved video: {valid_src} -> {target_fn} ({valid_src.stat().st_size} bytes)", flush=True)
                     db.log_event(f"Đã lưu video Scene {sid} (mediaId={safe_mid}) -> {target_fn.name}", level="SUCCESS", kind="flow")
                     sidx = int(msg.get("sceneIndex") or (sid - 1))
-                    db.save_scene_checkpoint(jid, sidx, scene_id=sid, video_media_id=mid,
+                    db.save_scene_checkpoint(jid, sidx, run_id=rid, attempt_id=aid, scene_id=sid, video_media_id=mid,
                                              local_path=str(target_fn), status="DOWNLOADED", progress=100)
                     fut = self.job_waiters.get(jid)
                     if fut and not fut.done():

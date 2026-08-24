@@ -301,25 +301,30 @@ def test_authoritative_checkpoint_monotonic(tmp: Path) -> None:
             c.execute("INSERT INTO job_templates(id, slug, name, engine, created_at, updated_at) VALUES('tpl', 'tpl_slug', 'Tpl', 'custom', '2026-08-24T00:00:00', '2026-08-24T00:00:00')")
             c.execute("INSERT INTO job_instances(id, template_id, name, config_json, created_at, updated_at) VALUES('inst_test', 'tpl', 'Test', '{}', '2026-08-24T00:00:00', '2026-08-24T00:00:00')")
             c.execute("INSERT INTO runs(id, instance_id, template_id, engine, status, created_at, updated_at) VALUES('run_mon', 'inst_test', 'tpl', 'custom', 'running', '2026-08-24T00:00:00', '2026-08-24T00:00:00')")
-        # 1. Normal save to DONE
-        db.save_scene_checkpoint("job_mon", 0, run_id="run_mon", scene_id=1, status="DONE", attempt_id="1")
+        # 1. Normal save to DONE on attempt 1 with 100% progress
+        db.save_scene_checkpoint("job_mon", 0, run_id="run_mon", scene_id=1, status="DONE", progress=100, attempt_id="1")
         cp = db.get_scene_checkpoint("job_mon", 0)
-        assert cp["status"] == "DONE"
+        assert cp["status"] == "DONE" and cp["progress"] == 100
         
         # 2. Late event RUNNING on attempt 1 should be IGNORED (monotonic protection)
-        db.save_scene_checkpoint("job_mon", 0, run_id="run_mon", scene_id=1, status="RUNNING", attempt_id="1")
+        db.save_scene_checkpoint("job_mon", 0, run_id="run_mon", scene_id=1, status="RUNNING", progress=20, attempt_id="1")
         cp = db.get_scene_checkpoint("job_mon", 0)
-        assert cp["status"] == "DONE"
+        assert cp["status"] == "DONE" and cp["progress"] == 100
 
         # 3. Mark scene 2 as FAILED on attempt 1
-        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="FAILED", attempt_id="1")
+        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="FAILED", progress=80, attempt_id="1")
         cp2 = db.get_scene_checkpoint("job_mon", 1)
         assert cp2["status"] == "FAILED"
 
-        # 4. Retry attempt 2 should be ALLOWED to transition to RUNNING
-        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="RUNNING", attempt_id="2")
+        # 4. Retry attempt 2 should transition to RUNNING and reset progress to 10% (NOT keep 80%!)
+        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="RUNNING", progress=10, attempt_id="2")
         cp2_retry = db.get_scene_checkpoint("job_mon", 1)
-        assert cp2_retry["status"] == "RUNNING"
+        assert cp2_retry["status"] == "RUNNING" and cp2_retry["progress"] == 10 and cp2_retry["attempt_id"] == "2"
+
+        # 5. Stale event from attempt 1 (e.g. DONE from old worker) arrives late -> MUST BE REJECTED!
+        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="DONE", progress=100, attempt_id="1")
+        cp2_stale = db.get_scene_checkpoint("job_mon", 1)
+        assert cp2_stale["status"] == "RUNNING" and cp2_stale["progress"] == 10 and cp2_stale["attempt_id"] == "2"
     finally:
         db.DB_PATH = old_db
 
