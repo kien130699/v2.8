@@ -1,11 +1,11 @@
-﻿\"\"\"
+"""
 V2.8.6.0 7-Job Sequential Integration & Torture Test Suite.
 
 Tier 1: Orchestration & State Machine Testing (CREATE -> RUN -> POLL -> RETRY -> CANCEL -> SQLITE CHECK)
 Tier 2: Real Flow Execution (Optional flag --real-flow)
 
 Generates structured diagnostic artifacts in data/TEST_<TIMESTAMP>/
-\"\"\"
+"""
 
 from __future__ import annotations
 
