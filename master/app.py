@@ -721,6 +721,32 @@ async def shopee_session_health():
     ready = bool(res.get("ok") and "Custom Link" in body and ("L?y link" in body or "L\u1ea5y link" in body))
     return {"ok": bool(res.get("ok")), "ready": ready, "risk": bool(diag.get("risk")), "url": diag.get("url"), "title": diag.get("title"), "boxes": diag.get("boxes", [])[:6]}
 
+@app.delete("/api/runs")
+def clear_all_runs_and_media():
+    with db.connect() as c:
+        for t in ["runs", "run_steps", "scene_checkpoints", "publish_jobs"]:
+            try:
+                c.execute(f"DELETE FROM {t}")
+            except Exception:
+                pass
+        c.commit()
+    for d in [ROOT / "modules" / "facebook" / "engine_v27" / "work",
+              ROOT / "modules" / "facebook" / "engine_v27" / "output",
+              ROOT / "modules" / "facebook" / "engine_v27" / "input" / "celebrity",
+              ROOT / "data" / "FlowAutomationServer",
+              ROOT / "data" / "FlowPairAuto"]:
+        if d.exists():
+            for item in d.iterdir():
+                try:
+                    if item.is_dir():
+                        shutil.rmtree(item, ignore_errors=True)
+                    else:
+                        item.unlink(missing_ok=True)
+                except Exception:
+                    pass
+    return {"ok": True, "message": "Đã xóa toàn bộ jobs và media caches."}
+
+
 @app.get("/api/flow")
 def flow_status():
     return {
