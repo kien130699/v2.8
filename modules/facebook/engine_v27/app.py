@@ -2486,21 +2486,33 @@ def main() -> None:
     used_ids: set[str] = set()
 
     if reference_mode:
-        broll_queries = style_cfg.get("broll_queries") or [
-            "city night aerial drone traffic cinematic",
-            "modern city night aerial drone lights traffic",
-        ]
-        broll_queries = [str(x).strip() for x in broll_queries if str(x).strip()]
+        pool_file = ROOT.parents[2] / "job_types" / "celebrity" / "broll_pool.json"
+        extra_pool = []
+        if pool_file.exists():
+            try:
+                extra_pool = json.loads(pool_file.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        broll_queries = (style_cfg.get("broll_queries") or []) + extra_pool
         if not broll_queries:
-            raise RuntimeError("style.broll_queries Ä‘ang rá»—ng.")
+            broll_queries = [
+                "city night aerial drone traffic cinematic",
+                "modern skyscraper skyline timelapse 4k",
+                "luxury penthouse interior design sunset",
+                "stock market trading charts graph screen",
+                "businessman working late office laptop",
+                "counting cash money bills financial success",
+            ]
+        broll_queries = [str(x).strip() for x in broll_queries if str(x).strip()]
+        random.shuffle(broll_queries)
 
-        clip_count = max(1, min(2, int(style_cfg.get("broll_clip_count", 2) or 2)))
-        motion_min = float(style_cfg.get("motion_min_score", 2.0) or 2.0)
+        clip_count = max(1, min(12, int(style_cfg.get("broll_clip_count", 5) or 5)))
+        motion_min = float(style_cfg.get("motion_min_score", 1.5) or 1.5)
         motion_attempts = max(1, int(style_cfg.get("motion_attempts", 5) or 5))
         durations = split_reference_durations(broll_total, clip_count)
 
         log(
-            f"REFERENCE MODE: {clip_count} B-roll liÃªn tá»¥c | "
+            f"REFERENCE MODE: {clip_count} B-roll liên tục (từ kho {len(broll_queries)} từ khóa) | "
             f"motion_min={motion_min:.2f} | output={output_width}x{output_height}"
         )
 

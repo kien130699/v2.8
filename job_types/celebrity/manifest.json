@@ -208,8 +208,8 @@
     "subtitle_font_size": 58,
     "subtitle_max_words": 7,
     "subtitle_max_chars": 38,
-    "broll_clip_count": 2,
-    "motion_min_score": 2.0,
+    "broll_clip_count": 5,
+    "motion_min_score": 1.5,
     "motion_attempts": 5,
     "audio_mode": "visual_only",
     "mute_original_audio": true,
@@ -352,7 +352,7 @@
       "type": "number",
       "label": "Số B-roll",
       "min": 1,
-      "max": 6
+      "max": 12
     },
     "motion_min_score": {
       "type": "number",
