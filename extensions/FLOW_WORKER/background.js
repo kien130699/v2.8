@@ -972,9 +972,10 @@ function enqueueServerFlowJob(message){
   const jobId=String(message?.jobId||'').trim();
   if(!jobId) return;
   if(!serverAutomationAllowed){
-    if(serverSocket && serverSocket.readyState===WebSocket.OPEN && !serverRunPromise && !activeServerBatch){
+    if(serverSocket && (serverSocket.readyState===WebSocket.OPEN || serverSocket.readyState===WebSocket.CONNECTING) && !serverRunPromise && !activeServerBatch){
       serverAutomationAllowed=true;
       serverFailSafeReason=null;
+      serverFailSafeLatched=false;
     }else{
       sendServerMessage({type:'FLOW_JOB_RESULT',jobId,ok:false,error:`Extension FAIL-SAFE đang khóa browser: ${serverFailSafeReason||'server_offline'}`});
       return;
@@ -1018,11 +1019,22 @@ async function runServerQueueLoop(){
     const signature=serverFlowSignature(first?.flow||{});
     const initial=[first,...takeQueuedServerJobs(signature)];
     try{
-      await runServerJobGroup(initial,signature);
+      const tab=await ensureFlowToolTab();
+      assertServerAutomationAllowed('server tab verify');
+      if(!tab?.id) throw new Error('Không tạo/tìm được Google Flow tab.');
+      const flow=first?.flow||{};
+      await runServerBatchJob(tab.id,signature,initial,flow);
     }catch(error){
-      if(!serverAutomationAllowed) throw error;
-      await appendLog(`SERVER JOB GROUP lỗi · sẽ tiếp tục queue sau 2s · ${error?.message||error}`,'error');
-      await sleep(2000);
+      const errText=error?.message||String(error);
+      const fatalCircuit=isFatalFlowUiError(error);
+      if(fatalCircuit){
+        tripFlowUiCircuit(error);
+      }
+      for(const item of initial){
+        const jId=String(item?.jobId||'');
+        sendServerMessage({type:'FLOW_JOB_RESULT',jobId:jId,ok:false,error:errText});
+        serverAcceptedJobIds.delete(jId);
+      }
     }
   }
 }
@@ -1037,12 +1049,12 @@ async function connectServerBridge(force=false){
   let ws;
   try{ws=new WebSocket(cfg.url);}catch(error){
     await setServerStatus({connected:false,url:cfg.url,lastError:error?.message||String(error)});
-    serverReconnectTimer=setTimeout(()=>connectServerBridge(false),3000);return;
+    serverReconnectTimer=setTimeout(()=>connectServerBridge(false),1000);return;
   }
   serverSocket=ws;
   ws.onopen=async()=>{
     serverFailSafeLatched=false;
-    serverReconnectBackoffMs=5000;
+    serverReconnectBackoffMs=500;
     serverFailSafeReason=null;
     serverAutomationAllowed=!(serverRunPromise||activeServerBatch);
     if(!serverAutomationAllowed){
