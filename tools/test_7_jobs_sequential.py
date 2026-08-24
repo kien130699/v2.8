@@ -112,10 +112,10 @@ def upload_sample_persona(base_url: str, instance_id: str, field_name: str = "pe
 
 
 class SmartTestAgent:
-    def __init__(self, base_url: str = "http://127.0.0.1:3000", timeout: float = 90.0, real_flow: bool = False, retry_on_fail: bool = True) -> None:
+    def __init__(self, base_url: str = "http://127.0.0.1:3000", timeout: float = 90.0, mode: str = "integration", retry_on_fail: bool = True) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.real_flow = real_flow
+        self.mode = mode.lower()  # 'dispatch', 'integration', 'full'
         self.retry_on_fail = retry_on_fail
         self.session_id = f"TEST_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         self.session_dir = ROOT / "data" / self.session_id
@@ -147,7 +147,7 @@ class SmartTestAgent:
         print(f"[{ts}] [+{(elapsed):06.2f}s] {badge} [{tag}] {msg}", flush=True)
 
     def preflight_check(self, auto_recover: bool = True) -> dict[str, Any]:
-        self.log("PREFLIGHT", "=== KIỂM TRA HỆ THỐNG TRƯỚC KHI TEST ===")
+        self.log("PREFLIGHT", f"=== KIỂM TRA HỆ THỐNG TRƯỚC KHI TEST (Mode: {self.mode.upper()}) ===")
         health = request_json("GET", f"{self.base_url}/api/health", timeout=5.0)
         if not health.get("ok"):
             self.log("PREFLIGHT", f"Server V2.8 không online tại {self.base_url}", level="ERROR")
@@ -187,7 +187,7 @@ class SmartTestAgent:
         job_dir.mkdir(parents=True, exist_ok=True)
         states_fp = (job_dir / "states.jsonl").open("a", encoding="utf-8")
 
-        self.log(f"JOB-{seq:02d}", f"=== TEST {seq}/7: {name} (Template: {template_id}, Kind: {test_kind}) ===")
+        self.log(f"JOB-{seq:02d}", f"=== TEST {seq}/7: {name} (Template: {template_id}, Kind: {test_kind}, Mode: {self.mode}) ===")
 
         # 1. Create Instance (POST /api/jobs) with strict empty config
         create_req = {
@@ -253,8 +253,6 @@ class SmartTestAgent:
             # Watchdog 1: Deadlock detection when waiting_engine
             if st == "waiting_engine" and (now - start > 10.0) and not deadlock_recovered:
                 self.log(f"JOB-{seq:02d}", f"Phát hiện Engine Lock! Đang tự động giải phóng lease cũ...", level="WARNING")
-                err_text = str(run_data.get("error") or "")
-                # Find blocking run id from error message or DB
                 blocking = query_db("SELECT id FROM runs WHERE template_id=? AND id<>? AND status IN ('dispatching','preparing','running','rendering')",
                                     (str(template_id), run_id))
                 for b in blocking:
@@ -270,15 +268,17 @@ class SmartTestAgent:
                 cancel_res = request_json("POST", f"{self.base_url}/api/runs/{run_id}/cancel")
                 self.log(f"JOB-{seq:02d}", f"Cancel response: {cancel_res}")
 
-            # Terminal Conditions
-            if st in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled", "failed"}:
-                final_state = run_data
-                break
-            if not self.real_flow and st in {"waiting_flow", "queued"}:
-                # In Tier 1 orchestration testing, reaching queued/waiting_flow confirms complete dispatch pipeline
-                time.sleep(2.0)
-                final_state = run_data
-                break
+            # Terminal Conditions based on mode
+            if self.mode == "dispatch":
+                if st in {"queued", "waiting_flow", "preparing", "running", "completed", "done", "done_no_pages", "cancelled"}:
+                    time.sleep(2.0)
+                    final_state = run_data
+                    break
+            else:
+                # Mode integration / full
+                if st in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled", "failed"}:
+                    final_state = run_data
+                    break
 
             time.sleep(2.0)
 
@@ -293,20 +293,27 @@ class SmartTestAgent:
         err_msg = (db_run[0].get("error") if db_run else None) or (final_state.get("error") if final_state else None)
 
         classification = "UNKNOWN"
-        if final_status in {"completed", "done", "published"}:
-            classification = "PASS_FULL_PIPELINE"
-        elif final_status in {"done_no_pages", "dry_run_ok"}:
-            classification = "PASS_ORCHESTRATION_NO_PAGE"
-        elif final_status == "cancelled":
-            classification = "PASS_CANCEL_IDENTITY_GUARD"
-        elif not self.real_flow and final_status in {"waiting_flow", "queued"}:
-            classification = "PASS_FLOW_DISPATCH_ORCHESTRATION"
-        elif final_status == "TIMEOUT":
-            classification = "FAIL_TIMEOUT_FREEZE"
-        elif final_status == "waiting_engine":
-            classification = "FAIL_ENGINE_DEADLOCK"
-        elif final_status == "failed":
-            classification = "FAIL_ENGINE_EXECUTION"
+        if self.mode == "dispatch":
+            if final_status in {"queued", "waiting_flow", "preparing", "running", "completed", "done", "done_no_pages"}:
+                classification = "PASS_FLOW_DISPATCH_ORCHESTRATION"
+            elif final_status == "cancelled":
+                classification = "PASS_CANCEL_IDENTITY_GUARD"
+            else:
+                classification = f"FAIL_{final_status.upper()}"
+        else:
+            # Mode integration / full deep verification
+            if final_status in {"completed", "done", "published"}:
+                classification = "PASS_FULL_PIPELINE"
+            elif final_status in {"done_no_pages", "dry_run_ok"}:
+                classification = "PASS_ORCHESTRATION_NO_PAGE"
+            elif final_status == "cancelled":
+                classification = "PASS_CANCEL_IDENTITY_GUARD"
+            elif final_status == "TIMEOUT":
+                classification = "FAIL_TIMEOUT_FREEZE"
+            elif final_status == "waiting_engine":
+                classification = "FAIL_ENGINE_DEADLOCK"
+            elif final_status == "failed":
+                classification = "FAIL_ENGINE_EXECUTION"
 
         is_pass = classification.startswith("PASS")
         badge = "SUCCESS" if is_pass else "ERROR"
@@ -372,14 +379,14 @@ class SmartTestAgent:
             "total": total,
             "passed": passed,
             "failed": failed,
-            "realFlow": self.real_flow,
+            "mode": self.mode,
             "results": self.job_results,
         }
         (self.session_dir / "FINAL_REPORT.json").write_text(json.dumps(final_report, indent=2, ensure_ascii=False), encoding="utf-8")
 
         # Console Summary Table
         print("\n" + "=" * 65)
-        print(f"📊 BÁO CÁO TỔNG KẾT SMART WATCHDOG TEST ({self.session_id})")
+        print(f"📊 BÁO CÁO TỔNG KẾT SMART WATCHDOG TEST ({self.session_id} · Mode: {self.mode.upper()})")
         print("=" * 65)
         for r in self.job_results:
             seq = r.get("sequence", 0)
@@ -411,12 +418,14 @@ def main() -> None:
     parser.add_argument("--url", default="http://127.0.0.1:3000", help="Base URL of server")
     parser.add_argument("--preflight", action="store_true", help="Run preflight check only")
     parser.add_argument("--jobs", default="", help="Jobs to run e.g. '1-7', '2-7', '2', '2,3,4'")
-    parser.add_argument("--real-flow", action="store_true", help="Wait for full Google Flow rendering")
+    parser.add_argument("--mode", default="integration", choices=["dispatch", "integration", "full"], help="Test mode: dispatch (quick API check), integration (DB & checkpoint verification), full (full video render & download)")
+    parser.add_argument("--real-flow", action="store_true", help="Alias for --mode full")
     parser.add_argument("--no-retry", action="store_true", help="Do not retry failed jobs")
     parser.add_argument("--timeout", type=float, default=90.0, help="Timeout in seconds per job")
     args = parser.parse_args()
 
-    agent = SmartTestAgent(base_url=args.url, timeout=args.timeout, real_flow=args.real_flow, retry_on_fail=not args.no_retry)
+    mode = "full" if args.real_flow else args.mode
+    agent = SmartTestAgent(base_url=args.url, timeout=args.timeout, mode=mode, retry_on_fail=not args.no_retry)
     
     if args.preflight:
         agent.preflight_check(auto_recover=True)
