@@ -224,9 +224,12 @@ class SequentialTester:
         badge = "SUCCESS" if is_success else "ERROR"
         self.log(f"JOB-{seq:02d}", f"HOÀN THÀNH TEST ({elapsed}s) -> Kết quả: {status_flag}", level=badge)
 
+        if not is_success and diag.get("dbRun") and diag["dbRun"].get("error"):
+            print(f"\n❌ [CHI TIẾT LỖI JOB {seq}]: {diag['dbRun']['error']}\n", flush=True)
+
         return diag
 
-    def run_suite(self) -> dict[str, Any]:
+    def run_suite(self, start_from: int = 1, only_job: int | None = None) -> dict[str, Any]:
         self.log("INIT", f"BẮT ĐẦU 7-JOB SEQUENTIAL SUITE (Session: {self.session_id}, RealFlow: {self.real_flow})")
 
         # Health check
@@ -250,6 +253,11 @@ class SequentialTester:
             (6, "CANCEL_JOB_IDENTITY_GUARD", "6", {}, "INJECT_CANCEL"),
             (7, "FULL_FLOW_AND_QC_PIPELINE", "7", {}, "NORMAL"),
         ]
+
+        if only_job is not None:
+            suite_plan = [x for x in suite_plan if x[0] == only_job]
+        elif start_from > 1:
+            suite_plan = [x for x in suite_plan if x[0] >= start_from]
 
         for seq, name, tpl_id, cfg, mode in suite_plan:
             res = self.execute_job(seq, name, tpl_id, cfg, mode)
@@ -299,10 +307,12 @@ def main() -> None:
     parser.add_argument("--real-flow", action="store_true", help="Run with real Flow extension (wait for full video completion)")
     parser.add_argument("--no-fail-fast", action="store_true", help="Do not stop on first failure")
     parser.add_argument("--timeout", type=float, default=90.0, help="Timeout in seconds per job")
+    parser.add_argument("--start-from", type=int, default=1, help="Start testing from Job N (e.g. --start-from 2 for Flow jobs)")
+    parser.add_argument("--job", type=int, default=None, help="Run only a specific Job N (e.g. --job 2)")
     args = parser.parse_args()
 
     tester = SequentialTester(base_url=args.url, fail_fast=not args.no_fail_fast, timeout_per_job=args.timeout, real_flow=args.real_flow)
-    tester.run_suite()
+    tester.run_suite(start_from=args.start_from, only_job=args.job)
 
 
 if __name__ == "__main__":
