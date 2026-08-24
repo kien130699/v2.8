@@ -372,7 +372,7 @@ class EngineFacade:
                     c.commit()
             except Exception as exc:
                 db.log_event(f"Beauty legacy config sync {pid}: {exc}", level="WARNING", kind="beauty")
-        if bool(config.get("auto_generate_angles", True)):
+        if bool(config.get("auto_generate_angles", False)):
             try:
                 await self.call("beauty", "POST", f"/api/page-profiles/{pid}/angles/generate-missing", timeout=60)
                 deadline = asyncio.get_running_loop().time() + float(config.get("angle_ready_timeout_sec") or 900)
