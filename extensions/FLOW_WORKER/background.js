@@ -116,8 +116,7 @@ function isFatalFlowUiError(error){
       text.includes('settings verify') ||
       text.includes('không mở được settings') ||
       text.includes('page bridge') ||
-      text.includes('debugger permission') ||
-      text.includes('server fail-safe')
+      text.includes('debugger permission')
     );
   }
   return false;

@@ -676,11 +676,6 @@ class JobManager:
                     await self._execute_run(rid)
                     continue
                 self._run_queue_event.clear()
-                # Only brand-new queued rows should wake immediately. waiting_flow is polled at 1 Hz;
-                # treating waiting_flow as immediate work caused a hot loop that starved the API.
-                if db.row("SELECT id FROM runs WHERE status='queued' LIMIT 1"):
-                    self._run_queue_event.set()
-                    continue
                 try:
                     await asyncio.wait_for(self._run_queue_event.wait(), 1.0)
                 except asyncio.TimeoutError:

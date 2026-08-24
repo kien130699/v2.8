@@ -1399,9 +1399,9 @@ def _yt_dlp_options(outtmpl: str, quiet: bool = True) -> dict[str, Any]:
         "noplaylist": True,
         "quiet": quiet,
         "no_warnings": quiet,
-        "socket_timeout": 30,
-        "retries": 3,
-        "fragment_retries": 3,
+        "socket_timeout": 15,
+        "retries": 1,
+        "fragment_retries": 1,
         "overwrites": False,
     }
     browser = os.getenv("YT_DLP_COOKIES_FROM_BROWSER", "").strip()
