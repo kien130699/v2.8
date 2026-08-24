@@ -1229,16 +1229,21 @@ def _serper_payload(query: str, max_results: int) -> dict[str, Any]:
 
 def serper_video_search(query: str, max_results: int = 10) -> list[dict[str, Any]]:
     """Google Videos via Serper. Invalid relative /goto links are intentionally ignored."""
-    r = requests.post(
-        SERPER_VIDEOS_API,
-        json=_serper_payload(query, max_results),
-        timeout=30,
-        headers=_serper_headers(),
-    )
-    if r.status_code in {401, 403}:
-        raise RuntimeError("SERPER_API_KEY khÃ´ng há»£p lá»‡ hoáº·c khÃ´ng cÃ³ quyá»n gá»i API.")
-    r.raise_for_status()
-    rows = r.json().get("videos") or []
+    try:
+        r = requests.post(
+            SERPER_VIDEOS_API,
+            json=_serper_payload(query, max_results),
+            timeout=30,
+            headers=_serper_headers(),
+        )
+        if r.status_code in {401, 403, 400}:
+            log("Serper Videos lỗi/hết quota -> chuyển fallback")
+            return []
+        r.raise_for_status()
+        rows = r.json().get("videos") or []
+    except Exception as exc:
+        log(f"Serper Videos search exception: {exc}")
+        return []
     out: list[dict[str, Any]] = []
     skipped_redirects = 0
     for row in rows:
@@ -1260,23 +1265,28 @@ def serper_video_search(query: str, max_results: int = 10) -> list[dict[str, Any
             "image_url": str(row.get("imageUrl") or "").strip(),
         })
     if skipped_redirects:
-        log(f"Serper Videos tráº£ {skipped_redirects} link /goto khÃ´ng dÃ¹ng Ä‘Æ°á»£c -> chuyá»ƒn fallback Google Web Search.")
+        log(f"Serper Videos trả {skipped_redirects} link /goto không dùng được -> chuyển fallback Google Web Search.")
     return out
 
 
 def serper_web_video_search(query: str, name: str, max_results: int = 10) -> list[dict[str, Any]]:
     """Use normal Google web SERP to recover real YouTube/Vimeo URLs when Videos returns /goto tokens."""
     web_query = f'site:youtube.com/watch "{name}" interview speaking conversation {query}'
-    r = requests.post(
-        SERPER_SEARCH_API,
-        json=_serper_payload(web_query, max_results),
-        timeout=30,
-        headers=_serper_headers(),
-    )
-    if r.status_code in {401, 403}:
-        raise RuntimeError("SERPER_API_KEY khÃ´ng há»£p lá»‡ hoáº·c khÃ´ng cÃ³ quyá»n gá»i API.")
-    r.raise_for_status()
-    rows = r.json().get("organic") or []
+    try:
+        r = requests.post(
+            SERPER_SEARCH_API,
+            json=_serper_payload(web_query, max_results),
+            timeout=30,
+            headers=_serper_headers(),
+        )
+        if r.status_code in {401, 403, 400}:
+            log("Serper Web Search lỗi/hết quota -> chuyển fallback ytsearch")
+            return []
+        r.raise_for_status()
+        rows = r.json().get("organic") or []
+    except Exception as exc:
+        log(f"Serper Web Search exception: {exc}")
+        return []
     out: list[dict[str, Any]] = []
     for row in rows:
         link = _pick_serper_row_url(row)
@@ -1312,8 +1322,17 @@ def ytdlp_search_results(query: str, max_results: int = 8) -> list[dict[str, Any
     opts = _yt_dlp_options("%(id)s.%(ext)s")
     opts["skip_download"] = True
     opts["extract_flat"] = "in_playlist"
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(f"ytsearch{n}:{query}", download=False)
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(f"ytsearch{n}:{query}", download=False)
+    except Exception as exc:
+        if opts.get("cookiesfrombrowser") or _is_cookie_browser_error(exc):
+            log(f"yt-dlp search cookie browser lỗi -> retry không cookie: {exc}")
+            opts.pop("cookiesfrombrowser", None)
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(f"ytsearch{n}:{query}", download=False)
+        else:
+            raise
     entries = (info or {}).get("entries") or []
     out: list[dict[str, Any]] = []
     for pos, entry in enumerate(entries, start=1):
