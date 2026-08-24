@@ -1868,6 +1868,7 @@ def best_celebrity_talking_window(
     src: Path,
     clip_duration: float,
     cfg: dict[str, Any],
+    recent_starts: list[float] | None = None,
 ) -> tuple[float, float, int, float]:
     """Scan source efficiently for a 3-5s window containing a clear talking-head face."""
     source_duration = ffprobe_duration(src)
@@ -1899,8 +1900,9 @@ def best_celebrity_talking_window(
     if not cap.isOpened():
         return scan_min, 0.0, 0, 0.0
 
-    best = (scan_min, 0.0, 0, 0.0)
+    scored_windows: list[tuple[float, float, int, float]] = []
     samples = 4
+    recent = recent_starts or []
     try:
         for start in starts[: max_windows + 6]:
             frame_scores: list[float] = []
@@ -1922,11 +1924,25 @@ def best_celebrity_talking_window(
             # Hard penalty when the face appears only briefly (intro/logo/B-roll transitions).
             if hits < int(cfg.get("face_min_hits", 3) or 3):
                 combined *= 0.20
-            if combined > best[1]:
-                best = (start, combined, hits, consistency)
+            # Heavy penalty if start timestamp overlaps with recently used start times for this file
+            if any(abs(start - r) < 4.0 for r in recent):
+                combined *= 0.05
+            scored_windows.append((start, combined, hits, consistency))
     finally:
         cap.release()
-    return best
+
+    if not scored_windows:
+        return scan_min, 0.0, 0, 0.0
+
+    scored_windows.sort(key=lambda x: x[1], reverse=True)
+    # Pick randomly among top valid windows to guarantee visual variation across renders
+    top_candidates = scored_windows[:min(3, len(scored_windows))]
+    selected = random.choice(top_candidates) if top_candidates else scored_windows[0]
+    
+    # Add random jitter within [-0.5, 0.5] seconds so start_time is never identical across renders
+    start_jitter = max(scan_min, min(scan_max, selected[0] + random.uniform(-0.5, 0.5)))
+    return (start_jitter, selected[1], selected[2], selected[3])
+
 
 def record_celebrity_use(item: dict[str, Any], keep: int = 300) -> None:
     if not item:
@@ -1952,7 +1968,7 @@ def pick_celebrity_segment(cfg: dict[str, Any]) -> dict[str, Any] | None:
     folder.mkdir(parents=True, exist_ok=True)
     source_mode = str(cfg.get("source_mode") or "auto").strip().lower()
     if source_mode not in {"auto", "local", "url", "search"}:
-        raise RuntimeError("celebrity.source_mode chá»‰ nháº­n: auto/local/url/search")
+        raise RuntimeError("celebrity.source_mode chỉ nhận: auto/local/url/search")
 
     files = list_video_files(folder)
     resolved_mode = "local"
@@ -1976,13 +1992,13 @@ def pick_celebrity_segment(cfg: dict[str, Any]) -> dict[str, Any] | None:
                 files = list_video_files(folder)
                 resolved_mode = "search"
             except Exception as exc:
-                log(f"Celebrity online search lá»—i: {exc}")
+                log(f"Celebrity online search lỗi: {exc}")
 
     if not files:
         if bool(cfg.get("required", False)):
             raise RuntimeError(
-                f"KhÃ´ng cÃ³ celebrity video cho {name}. Folder: {folder}\n"
-                "V2.5 Ä‘Ã£ thá»­ theo source_mode. Vá»›i Google search hÃ£y thÃªm SERPER_API_KEY vÃ o .env."
+                f"Không có celebrity video cho {name}. Folder: {folder}\n"
+                "V2.5 đã thử theo source_mode. Với Google search hãy thêm SERPER_API_KEY vào .env."
             )
         return None
 
@@ -2003,10 +2019,14 @@ def pick_celebrity_segment(cfg: dict[str, Any]) -> dict[str, Any] | None:
             continue
     if not candidates:
         if bool(cfg.get("required", False)):
-            raise RuntimeError(f"KhÃ´ng cÃ³ clip celebrity há»£p lá»‡ trong {folder}")
+            raise RuntimeError(f"Không có clip celebrity hợp lệ trong {folder}")
         return None
 
-    recent_sigs = {str(x.get("signature") or "") for x in celebrity_history()[-avoid_recent:]} if avoid_recent else set()
+    # Shuffle candidates to prevent picking the exact same candidate file ordering
+    random.shuffle(candidates)
+
+    recent_entries = celebrity_history()[-avoid_recent:] if avoid_recent else []
+    recent_sigs = {str(x.get("signature") or "") for x in recent_entries}
     ranked: list[dict[str, Any]] = []
 
     # V2.5: scan every cached source and select a real talking-head window.
@@ -2016,18 +2036,25 @@ def pick_celebrity_segment(cfg: dict[str, Any]) -> dict[str, Any] | None:
         sidecar = src.with_suffix(src.suffix + ".json")
         source_meta = read_json(sidecar, {}) if sidecar.exists() else {}
 
+        src_resolved = str(src.resolve())
+        recent_starts = [
+            float(x.get("start_time") or 0.0)
+            for x in recent_entries
+            if str(Path(str(x.get("file") or "")).resolve()) == src_resolved
+        ]
+
         if face_verify:
             try:
-                start_time, verify_score, hits, consistency = best_celebrity_talking_window(src, duration, cfg)
+                start_time, verify_score, hits, consistency = best_celebrity_talking_window(src, duration, cfg, recent_starts=recent_starts)
             except Exception as exc:
-                log(f"Face verify bá» {src.name}: {exc}")
+                log(f"Face verify bỏ {src.name}: {exc}")
                 continue
             log(
                 f"Face scan {src.name}: start={start_time:.1f}s | score={verify_score:.1f} | "
                 f"face_hits={hits}/4"
             )
             if hits < face_min_hits or verify_score < face_min_score:
-                log(f"Bá»Ž {src.name}: khÃ´ng tháº¥y talking-head Ä‘á»§ rÃµ.")
+                log(f"BỎ {src.name}: không thấy talking-head đủ rõ.")
                 continue
         else:
             start_padding = max(0.0, float(cfg.get("start_padding", 0.25)))
@@ -2054,11 +2081,6 @@ def pick_celebrity_segment(cfg: dict[str, Any]) -> dict[str, Any] | None:
         ranked.append(item)
 
     if not ranked:
-        if bool(cfg.get("required", False)):
-            raise RuntimeError(
-                f"ÄÃ£ táº£i celebrity source nhÆ°ng khÃ´ng tÃ¬m tháº¥y Ä‘oáº¡n 3-5s cÃ³ máº·t ngÆ°á»i rÃµ cho {name}. "
-                "HÃ£y tÄƒng search_download_count hoáº·c Ä‘á»•i search_query."
-            )
         return None
 
     ranked.sort(
