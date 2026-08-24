@@ -2488,7 +2488,7 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
             if int(getattr(req, 'location_anchor_strength', 85) or 0) >= 50 else ""
         )
         image_prompt = (
-            f"Photorealistic adult woman, age 21+, same exact identity, face, hairstyle and recognizable facial features as the person reference. "
+            f"Photorealistic Vietnamese adult woman, age 21+, East Asian ethnicity, fair natural skin tone, same exact identity, face, hairstyle and recognizable facial features as the person reference. "
             f"{body}. Theme: {theme}. Styling: {sexy}. {outfit_clause} {angle_clause} "
             f"{scene_lock} Scene preset: {_scene_mode_label(scene_mode, scene_mix)}. "
             f"Scene {i+1}: {bg_order[i]}; pose: {pose_order[i]}. "
@@ -2500,6 +2500,7 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
         if i in motion_scene_ids:
             video_prompt = (
                 f"Use the attached generated image as the exact first-frame identity reference. {motion_order[i]} "
+                "Preserve East Asian ethnicity, fair skin tone, face, outfit and body identity. "
                 "Keep the exact same adult woman's face, body proportions, hairstyle, back-of-head appearance, outfit, background and lighting. "
                 "If the subject turns or rotates, preserve the same hair shape, hair parting, side profile and rear hair consistency from the multi-angle reference pack. "
                 "Natural realistic body movement and cloth physics. No talking, no lip-sync, no scene redesign, no morphing. Vertical social video."

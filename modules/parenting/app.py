@@ -2022,7 +2022,7 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
         )
         angle_clause = "Use the full multi-angle persona pack when available: front, bust, left, right and back references. Keep hair parting, hair volume, ear visibility, neck, shoulder line and back-of-head appearance consistent across all views."
         image_prompt = (
-            f"Photorealistic adult woman, age 21+, same exact identity, face, hairstyle and recognizable facial features as the person reference. "
+            f"Photorealistic Vietnamese adult woman, age 21+, East Asian ethnicity, fair natural skin tone, same exact identity, face, hairstyle and recognizable facial features as the person reference. "
             f"{body}. Theme: {theme}. Styling: {sexy}. {outfit_clause} {angle_clause} "
             f"Scene {i+1}: {bg_order[i]}; pose: {pose_order[i]}. "
             "Natural realistic skin texture, attractive social-media photography, full body or three-quarter body, vertical 9:16 composition, "
@@ -2032,6 +2032,7 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
         if mode == "IMAGE_TO_VIDEO":
             video_prompt = (
                 f"Use the attached generated image as the exact first-frame identity reference. {motion_order[i]} "
+                "Preserve East Asian ethnicity, fair skin tone, face, outfit and body identity. "
                 "Keep the exact same adult woman's face, body proportions, hairstyle, back-of-head appearance, outfit, background and lighting. "
                 "If the subject turns or rotates, preserve the same hair shape, hair parting, side profile and rear hair consistency from the multi-angle reference pack. "
                 "Natural realistic body movement and cloth physics. No talking, no lip-sync, no scene redesign, no morphing. Vertical social video."
