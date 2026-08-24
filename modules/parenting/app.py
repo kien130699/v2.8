@@ -2005,8 +2005,8 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
     })
 
     scenes: list[dict[str, Any]] = []
-    preferred_bg = str(plan.get("background") or "").strip()
-    preferred_pose = str(plan.get("pose") or "").strip()
+    preferred_bg = _clean_prompt_mojibake(str(plan.get("background") or "").strip())
+    preferred_pose = _clean_prompt_mojibake(str(plan.get("pose") or "").strip())
     bg_order = random.sample(backgrounds, min(len(backgrounds), count)) if len(backgrounds) >= count else [random.choice(backgrounds) for _ in range(count)]
     pose_order = random.sample(poses, min(len(poses), count)) if len(poses) >= count else [random.choice(poses) for _ in range(count)]
     if preferred_bg:
@@ -2028,6 +2028,7 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
             "Natural realistic skin texture, attractive social-media photography, full body or three-quarter body, vertical 9:16 composition, "
             "realistic anatomy, no text, no watermark, no nudity, no transparent clothing."
         )
+        image_prompt = _clean_prompt_mojibake(image_prompt)
         video_prompt = ""
         if mode == "IMAGE_TO_VIDEO":
             video_prompt = (
@@ -2037,6 +2038,7 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
                 "If the subject turns or rotates, preserve the same hair shape, hair parting, side profile and rear hair consistency from the multi-angle reference pack. "
                 "Natural realistic body movement and cloth physics. No talking, no lip-sync, no scene redesign, no morphing. Vertical social video."
             )
+            video_prompt = _clean_prompt_mojibake(video_prompt)
         metadata = {
             **meta_base,
             "variation": i + 1,

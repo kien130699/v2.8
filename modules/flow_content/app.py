@@ -1302,20 +1302,20 @@ def _choose_outfit_color(profile_id: str) -> str:
     return picked
 
 LEGACY_VI_OUTFITS = [
-    "Ã¡o crop top thá»ƒ thao thoÃ¡ng mÃ¡t Ã´m dÃ¡ng vá»›i quáº§n short gym cáº¡p cao",
-    "Ã¡o hai dÃ¢y Ã´m dÃ¡ng nháº¹ mÃ¡t vá»›i quáº§n short Ä‘á»‹nh hÃ¬nh",
-    "Ã¡o thá»ƒ thao há»“ng Ã´m dÃ¡ng vá»›i quáº§n legging gym",
+    "Ã¡o crop top thá»ƒ thao thoÃ¡ng mÃ¡t Ã´m dÃ¡ng với quáº§n short gym cáº¡p cao",
+    "Ã¡o hai dÃ¢y Ã´m dÃ¡ng nhẹ mÃ¡t với quáº§n short Ä‘á»‹nh hÃ¬nh",
+    "Ã¡o thá»ƒ thao há»“ng Ã´m dÃ¡ng với quáº§n legging gym",
     "Ä‘áº§m mini Ä‘en tÃ´n dÃ¡ng, váº£i kÃ­n hoÃ n toÃ n vÃ  khÃ´ng xuyÃªn tháº¥u",
-    "bá»™ athleisure mÃ u be Ã´m dÃ¡ng vá»›i Ã¡o dÃ i tay dÃ¡ng crop",
+    "bá»™ athleisure mÃ u be Ã´m dÃ¡ng với Ã¡o dÃ i tay dÃ¡ng crop",
 ]
 
 LEGACY_VI_BACKGROUNDS = [
-    "phÃ²ng gym hiá»‡n Ä‘áº¡i cao cáº¥p cÃ³ gÆ°Æ¡ng vÃ  Ã¡nh sÃ¡ng má»m",
+    "phòng gym hiá»‡n Ä‘áº¡i cao cáº¥p cÃ³ gÆ°Æ¡ng vÃ  Ã¡nh sÃ¡ng má»m",
     "studio thá»ƒ hÃ¬nh sÃ¡ng, sáº¡ch",
-    "phÃ²ng gym khÃ¡ch sáº¡n cao cáº¥p",
-    "quÃ¡n cÃ  phÃª phong cÃ¡ch sá»‘ng hiá»‡n Ä‘áº¡i vá»›i cá»­a sá»• lá»›n",
+    "phòng gym khÃ¡ch sáº¡n cao cáº¥p",
+    "quÃ¡n cÃ  phÃª phong cÃ¡ch sá»‘ng hiá»‡n Ä‘áº¡i với cá»­a sá»• lá»›n",
     "cÄƒn há»™ cao cáº¥p ngáº­p Ã¡nh náº¯ng",
-    "Ä‘Æ°á»ng phá»‘ ban Ä‘Ãªm vá»›i Ã¡nh sÃ¡ng Ä‘iá»‡n áº£nh thá»±c táº¿",
+    "Ä‘Æ°á»ng phá»‘ ban Ä‘Ãªm với Ã¡nh sÃ¡ng Ä‘iá»‡n áº£nh thá»±c táº¿",
 ]
 
 LEGACY_DEFAULT_BACKGROUNDS = [
@@ -1332,33 +1332,33 @@ LEGACY_DEFAULT_BACKGROUNDS = [
 ]
 
 DEFAULT_BACKGROUNDS = [
-    "phá»‘ Ä‘i bá»™ Nguyá»…n Huá»‡, Quáº­n 1, TP.HCM, buá»•i chiá»u tá»‘i vá»›i hÃ ng cÃ¢y vÃ  tÃ²a nhÃ  Ä‘Ã´ thá»‹",
+    "phá»‘ Ä‘i bá»™ Nguyá»…n Huá»‡, Quáº­n 1, TP.HCM, buá»•i chiá»u tá»‘i với hÃ ng cÃ¢y vÃ  tÃ²a nhÃ  Ä‘Ã´ thá»‹",
     "BÆ°u Ä‘iá»‡n Trung tÃ¢m SÃ i GÃ²n, Quáº­n 1, TP.HCM, Ã¡nh sÃ¡ng ban ngÃ y vÃ  kiáº¿n trÃºc vÃ ng Ä‘áº·c trÆ°ng",
-    "cÃ´ng viÃªn Vinhomes Central Park vá»›i Landmark 81 phÃ­a sau, BÃ¬nh Tháº¡nh, TP.HCM",
+    "công viên Vinhomes Central Park với Landmark 81 phÃ­a sau, Bình Thạnh, TP.HCM",
     "Cáº§u Má»‘ng nhÃ¬n vá» khu trung tÃ¢m vÃ  Bitexco, TP.HCM, golden hour",
-    "Há»“ HoÃ n Kiáº¿m gáº§n ThÃ¡p RÃ¹a, HÃ  Ná»™i, buá»•i sÃ¡ng dá»‹u nháº¹",
+    "Há»“ HoÃ n Kiáº¿m gáº§n ThÃ¡p RÃ¹a, HÃ  Ná»™i, buá»•i sÃ¡ng dá»‹u nhẹ",
     "Ä‘Æ°á»ng Thanh NiÃªn bÃªn Há»“ TÃ¢y, HÃ  Ná»™i, hÃ ng cÃ¢y vÃ  máº·t há»“ thoÃ¡ng",
     "khu NhÃ  thá» Lá»›n HÃ  Ná»™i, phá»‘ cá»•, Ã¡nh sÃ¡ng chiá»u",
-    "phá»‘ Táº¡ Hiá»‡n, HoÃ n Kiáº¿m, HÃ  Ná»™i, buá»•i tá»‘i cÃ³ Ä‘Ã¨n phá»‘ vÃ  biá»ƒn hiá»‡u",
-    "Cáº§u Rá»“ng bÃªn sÃ´ng HÃ n, ÄÃ  Náºµng, buá»•i tá»‘i vá»›i Ã¡nh Ä‘Ã¨n thÃ nh phá»‘",
-    "bÃ£i biá»ƒn Má»¹ KhÃª, ÄÃ  Náºµng, sÃ¡ng sá»›m hoáº·c golden hour",
+    "phá»‘ Táº¡ Hiá»‡n, HoÃ n Kiáº¿m, HÃ  Ná»™i, buổi tối cÃ³ Ä‘Ã¨n phá»‘ vÃ  biá»ƒn hiá»‡u",
+    "Cầu Rồng bÃªn sÃ´ng HÃ n, ÄÃ  Náºµng, buổi tối với ánh đèn thÃ nh phá»‘",
+    "bãi biển Mỹ Khê, ÄÃ  Náºµng, sáng sớm hoặc golden hour",
     "phá»‘ cá»• Há»™i An, Quáº£ng Nam, Ä‘Ã¨n lá»“ng vÃ ng vÃ  máº·t tiá»n nhÃ  cá»•",
     "Quáº£ng trÆ°á»ng LÃ¢m ViÃªn, ÄÃ  Láº¡t, LÃ¢m Äá»“ng, trá»i mÃ¡t vÃ  kiáº¿n trÃºc ná»¥ hoa atiso",
     "Ä‘Æ°á»ng Tráº§n PhÃº ven biá»ƒn Nha Trang, KhÃ¡nh HÃ²a, hÃ ng dá»«a vÃ  biá»ƒn xanh",
-    "Báº¿n Ninh Kiá»u, Cáº§n ThÆ¡, chiá»u tá»‘i bÃªn sÃ´ng Háº­u",
+    "Báº¿n Ninh Kiá»u, Cần Thơ, chiá»u tá»‘i bÃªn sÃ´ng Háº­u",
     "khu vá»±c Äáº¡i Ná»™i Huáº¿, thÃ nh phá»‘ Huáº¿, kiáº¿n trÃºc cung Ä‘Ã¬nh vÃ  tÆ°á»ng Ä‘á»",
     "khu phá»‘ ven biá»ƒn Háº¡ Long nhÃ¬n ra vá»‹nh, Quáº£ng Ninh, hoÃ ng hÃ´n",
-    "má»™t quÃ¡n cÃ  phÃª sÃ¢n vÆ°á»n kiá»ƒu Viá»‡t táº¡i Tháº£o Äiá»n, TP.Thá»§ Äá»©c, Ã¡nh sÃ¡ng tá»± nhiÃªn",
+    "má»™t quÃ¡n cÃ  phÃª sÃ¢n vÆ°á»n kiá»ƒu Viá»‡t táº¡i Tháº£o Äiá»n, TP.Thá»§ Äá»©c, Ã¡nh sÃ¡ng tự nhiên",
     "ban cÃ´ng cÄƒn há»™ hiá»‡n Ä‘áº¡i nhÃ¬n ra skyline TP.HCM, phong cÃ¡ch lifestyle Viá»‡t Nam",
 ]
 
 LEGACY_VI_POSES = [
-    "Ä‘á»©ng tá»± nhiÃªn vÃ  nhÃ¬n vá» phÃ­a mÃ¡y quay",
-    "tÆ° tháº¿ selfie trÆ°á»›c gÆ°Æ¡ng tá»± nhiÃªn",
-    "Ä‘i vá» phÃ­a mÃ¡y quay vá»›i dÃ¡ng tá»± tin thoáº£i mÃ¡i",
-    "chá»‰nh tÃ³c tá»± nhiÃªn",
-    "tÆ° tháº¿ nghiÃªng ba pháº§n tÆ° thÆ° giÃ£n",
-    "Ä‘i ngang qua mÃ¡y quay rá»“i ngoÃ¡i nhÃ¬n tá»± nhiÃªn",
+    "Ä‘á»©ng tự nhiên vÃ  nhÃ¬n vá» phÃ­a máy quay",
+    "tư thế selfie trÆ°á»›c gÆ°Æ¡ng tự nhiên",
+    "Ä‘i vá» phÃ­a máy quay với dÃ¡ng tá»± tin thoáº£i mÃ¡i",
+    "chỉnh tóc tự nhiên",
+    "tư thế nghiÃªng ba pháº§n tÆ° thư giãn",
+    "Ä‘i ngang qua máy quay rồi ngoÃ¡i nhÃ¬n tự nhiên",
 ]
 
 LEGACY_DEFAULT_POSES = [
@@ -1375,16 +1375,16 @@ LEGACY_DEFAULT_POSES = [
 ]
 
 DEFAULT_POSES = [
-    "Ä‘á»©ng tá»± nhiÃªn nhÃ¬n vá» mÃ¡y quay, dÃ¡ng thoáº£i mÃ¡i",
-    "Ä‘i bá»™ cháº­m trÃªn phá»‘ rá»“i nhÃ¬n sang mÃ¡y quay",
-    "tá»±a nháº¹ lan can hoáº·c bá» tÆ°á»ng, gÃ³c ba pháº§n tÆ°",
-    "chá»‰nh tÃ³c má»™t láº§n rá»“i má»‰m cÆ°á»i nháº¹",
-    "cáº§m ly cÃ  phÃª mang Ä‘i vÃ  bÆ°á»›c cháº­m",
-    "ngá»“i trÃªn gháº¿ cÃ´ng viÃªn vá»›i tÆ° tháº¿ thÆ° giÃ£n",
-    "selfie tá»± nhiÃªn á»Ÿ khÃ´ng gian lifestyle, khÃ´ng pháº£i phÃ²ng gym",
-    "Ä‘i ngang qua mÃ¡y quay rá»“i ngoÃ¡i nhÃ¬n má»™t láº§n",
-    "Ä‘á»©ng cáº¡nh hÃ ng cÃ¢y hoáº·c máº·t há»“, xoay nháº¹ vai vá» mÃ¡y quay",
-    "bÆ°á»›c xuá»‘ng báº­c thá»m hoáº·c vá»‰a hÃ¨ vá»›i chuyá»ƒn Ä‘á»™ng tá»± nhiÃªn",
+    "Ä‘á»©ng tự nhiên nhÃ¬n vá» máy quay, dÃ¡ng thoáº£i mÃ¡i",
+    "Ä‘i bá»™ cháº­m trên phố rồi nhìn sang máy quay",
+    "tựa nhẹ lan can hoặc bá» tÆ°á»ng, góc ba phần tư",
+    "chỉnh tóc một lần rồi má»‰m cÆ°á»i nhẹ",
+    "cầm ly cÃ  phÃª mang đi vÃ  bước cháº­m",
+    "ngồi trên ghế công viên với tư thế thư giãn",
+    "selfie tự nhiên á»Ÿ không gian lifestyle, không phải phòng gym",
+    "Ä‘i ngang qua máy quay rồi ngoÃ¡i nhÃ¬n một lần",
+    "Ä‘á»©ng cáº¡nh hÃ ng cÃ¢y hoặc máº·t há»“, xoay nhẹ vai vá» máy quay",
+    "bước xuá»‘ng báº­c thá»m hoặc vá»‰a hÃ¨ với chuyá»ƒn Ä‘á»™ng tự nhiên",
 ]
 
 def _migrate_legacy_content_defaults(c: sqlite3.Connection) -> None:
@@ -1443,29 +1443,29 @@ SCENE_MODE_ALIASES = {
 }
 
 GYM_BACKGROUNDS = [
-    "phÃ²ng gym cao cáº¥p táº¡i TP.HCM vá»›i cá»­a kÃ­nh lá»›n, rack táº¡ tay, gÆ°Æ¡ng lá»›n vÃ  Ã¡nh sÃ¡ng ban ngÃ y",
-    "phÃ²ng gym chung cÆ° hiá»‡n Ä‘áº¡i á»Ÿ Tháº£o Äiá»n, TP.HCM, khu dumbbell sáº¡ch, gÆ°Æ¡ng lá»›n, skyline má» ngoÃ i cá»­a kÃ­nh",
+    "phòng gym cao cáº¥p táº¡i TP.HCM với cá»­a kÃ­nh lá»›n, rack táº¡ tay, gÆ°Æ¡ng lá»›n vÃ  Ã¡nh sÃ¡ng ban ngÃ y",
+    "phòng gym chung cÆ° hiá»‡n Ä‘áº¡i á»Ÿ Tháº£o Äiá»n, TP.HCM, khu dumbbell sáº¡ch, gÆ°Æ¡ng lá»›n, skyline má» ngoÃ i cá»­a kÃ­nh",
     "fitness studio cao cáº¥p á»Ÿ Quáº­n 1, TP.HCM, mÃ¡y táº­p hiá»‡n Ä‘áº¡i, Ã¡nh sÃ¡ng tráº¯ng má»m vÃ  sÃ n cao su tá»‘i mÃ u",
-    "phÃ²ng gym khÃ¡ch sáº¡n cao cáº¥p táº¡i ÄÃ  Náºµng, cá»­a kÃ­nh nhÃ¬n thÃ nh phá»‘, khu táº¡ tay vÃ  gháº¿ táº­p",
-    "phÃ²ng gym boutique gáº§n Há»“ TÃ¢y, HÃ  Ná»™i, gÆ°Æ¡ng lá»›n, rack táº¡, Ã¡nh sÃ¡ng tá»± nhiÃªn dá»‹u",
-    "phÃ²ng gym hiá»‡n Ä‘áº¡i táº¡i Nha Trang, khu free-weight thoÃ¡ng, cá»­a kÃ­nh lá»›n vÃ  Ã¡nh sÃ¡ng ban ngÃ y",
-    "khu dumbbell trong phÃ²ng gym cao cáº¥p, táº¡ xáº¿p gá»n phÃ­a sau, gÆ°Æ¡ng pháº£n chiáº¿u tá»± nhiÃªn, khÃ´ng cÃ³ phá»‘ ngoÃ i trá»i",
-    "khu mÃ¡y cable vÃ  gháº¿ táº­p trong phÃ²ng gym hiá»‡n Ä‘áº¡i, Ã¡nh sÃ¡ng tráº§n sáº¡ch, khÃ´ng gian fitness thá»±c táº¿",
-    "gÃ³c stretching trong phÃ²ng gym premium, tháº£m táº­p, gÆ°Æ¡ng lá»›n, rack táº¡ phÃ­a xa",
-    "khu squat rack vÃ  free-weight trong phÃ²ng gym cao cáº¥p, Ã¡nh sÃ¡ng Ä‘iá»‡n áº£nh thá»±c táº¿ nhÆ°ng váº«n sÃ¡ng rÃµ",
+    "phòng gym khÃ¡ch sáº¡n cao cáº¥p táº¡i ÄÃ  Náºµng, cá»­a kÃ­nh nhÃ¬n thÃ nh phá»‘, khu táº¡ tay vÃ  ghế táº­p",
+    "phòng gym boutique gáº§n Há»“ TÃ¢y, HÃ  Ná»™i, gÆ°Æ¡ng lá»›n, rack táº¡, Ã¡nh sÃ¡ng tự nhiên dá»‹u",
+    "phòng gym hiá»‡n Ä‘áº¡i táº¡i Nha Trang, khu free-weight thoÃ¡ng, cá»­a kÃ­nh lá»›n vÃ  Ã¡nh sÃ¡ng ban ngÃ y",
+    "khu dumbbell trong phòng gym cao cáº¥p, táº¡ xáº¿p gá»n phÃ­a sau, gÆ°Æ¡ng pháº£n chiáº¿u tự nhiên, khÃ´ng cÃ³ phá»‘ ngoÃ i trá»i",
+    "khu mÃ¡y cable vÃ  ghế táº­p trong phòng gym hiá»‡n Ä‘áº¡i, Ã¡nh sÃ¡ng tráº§n sáº¡ch, không gian fitness thá»±c táº¿",
+    "gÃ³c stretching trong phòng gym premium, tháº£m táº­p, gÆ°Æ¡ng lá»›n, rack táº¡ phÃ­a xa",
+    "khu squat rack vÃ  free-weight trong phòng gym cao cáº¥p, Ã¡nh sÃ¡ng Ä‘iá»‡n áº£nh thá»±c táº¿ nhÆ°ng váº«n sÃ¡ng rÃµ",
 ]
 
 GYM_POSES = [
-    "Ä‘á»©ng toÃ n thÃ¢n trong khu táº¡ tay, má»—i tay cáº§m má»™t dumbbell, nhÃ¬n mÃ¡y quay tá»± nhiÃªn",
-    "Ä‘á»©ng gÃ³c ba pháº§n tÆ° cáº¡nh rack táº¡, má»™t tay cáº§m dumbbell, tay kia tháº£ lá»ng",
-    "ngá»“i trÃªn gháº¿ táº­p, cáº§m hai dumbbell á»Ÿ hai bÃªn, tÆ° tháº¿ nghá»‰ giá»¯a hiá»‡p",
-    "thá»±c hiá»‡n dumbbell curl nháº¹ vá»›i khuá»·u tay giá»¯ gáº§n thÃ¢n, biá»ƒu cáº£m tá»± nhiÃªn",
-    "Ä‘á»©ng cáº¡nh gÆ°Æ¡ng gym, cáº§m bÃ¬nh nÆ°á»›c vÃ  má»™t dumbbell, tÆ° tháº¿ sau khi táº­p",
+    "Ä‘á»©ng toÃ n thÃ¢n trong khu táº¡ tay, má»—i tay cáº§m má»™t dumbbell, nhÃ¬n máy quay tự nhiên",
+    "Ä‘á»©ng góc ba phần tư cáº¡nh rack táº¡, má»™t tay cáº§m dumbbell, tay kia tháº£ lá»ng",
+    "ngồi trên ghế táº­p, cáº§m hai dumbbell á»Ÿ hai bÃªn, tư thế nghá»‰ giá»¯a hiá»‡p",
+    "thá»±c hiá»‡n dumbbell curl nhẹ với khuá»·u tay giá»¯ gáº§n thÃ¢n, biá»ƒu cáº£m tự nhiên",
+    "Ä‘á»©ng cáº¡nh gÆ°Æ¡ng gym, cáº§m bÃ¬nh nÆ°á»›c vÃ  má»™t dumbbell, tư thế sau khi táº­p",
     "Ä‘á»©ng chÃ¢n rá»™ng vá»«a pháº£i, cáº§m hai dumbbell sÃ¡t Ä‘Ã¹i, vai tháº£ lá»ng",
-    "tá»±a nháº¹ vÃ o gháº¿ táº­p, má»™t chÃ¢n bÆ°á»›c trÆ°á»›c, giá»¯ dumbbell tá»± nhiÃªn",
-    "Ä‘á»©ng cáº¡nh cable machine, chá»‰nh tÃ³c má»™t láº§n rá»“i nhÃ¬n láº¡i mÃ¡y quay",
-    "ngá»“i gháº¿ táº­p vÃ  nÃ¢ng má»™t dumbbell nháº¹ báº±ng tay pháº£i, tÆ° tháº¿ kiá»ƒm soÃ¡t",
-    "Ä‘á»©ng trÆ°á»›c rack táº¡ vá»›i gÃ³c mÃ¡y tháº¥p nháº¹, body fitness rÃµ nhÆ°ng giáº£i pháº«u tá»± nhiÃªn",
+    "tựa nhẹ vÃ o ghế táº­p, má»™t chÃ¢n bước trÆ°á»›c, giá»¯ dumbbell tự nhiên",
+    "Ä‘á»©ng cáº¡nh cable machine, chỉnh tóc một lần rồi nhÃ¬n láº¡i máy quay",
+    "ngá»“i ghế táº­p vÃ  nÃ¢ng má»™t dumbbell nhẹ báº±ng tay pháº£i, tư thế kiá»ƒm soÃ¡t",
+    "Ä‘á»©ng trÆ°á»›c rack táº¡ với gÃ³c mÃ¡y tháº¥p nhẹ, body fitness rÃµ nhÆ°ng giáº£i pháº«u tự nhiên",
 ]
 
 GYM_OUTFITS = [
@@ -1493,25 +1493,25 @@ GYM_VIDEO_MOTIONS = [
 ]
 
 BEACH_BACKGROUNDS = [
-    "bÃ£i biá»ƒn Má»¹ KhÃª, ÄÃ  Náºµng, sÃ¡ng sá»›m, cÃ¡t sáº¡ch, biá»ƒn xanh vÃ  hÃ ng dá»«a xa phÃ­a sau",
-    "bÃ£i biá»ƒn Nha Trang, KhÃ¡nh HÃ²a, golden hour, lá»‘i Ä‘i ven biá»ƒn vÃ  máº·t nÆ°á»›c sÃ¡ng",
-    "bÃ£i biá»ƒn PhÃº Quá»‘c, KiÃªn Giang, hoÃ ng hÃ´n nháº¹, resort nhiá»‡t Ä‘á»›i á»Ÿ xa",
-    "bÃ£i biá»ƒn BÃ£i Sau, VÅ©ng TÃ u, sÃ¡ng sá»›m, bá» biá»ƒn rá»™ng vÃ  Ã¡nh sÃ¡ng tá»± nhiÃªn",
+    "bãi biển Mỹ Khê, ÄÃ  Náºµng, sáng sớm, cÃ¡t sáº¡ch, biá»ƒn xanh vÃ  hÃ ng dá»«a xa phÃ­a sau",
+    "bãi biển Nha Trang, KhÃ¡nh HÃ²a, golden hour, lá»‘i Ä‘i ven biá»ƒn vÃ  máº·t nÆ°á»›c sÃ¡ng",
+    "bãi biển PhÃº Quá»‘c, KiÃªn Giang, hoÃ ng hÃ´n nhẹ, resort nhiá»‡t Ä‘á»›i á»Ÿ xa",
+    "bãi biển BÃ£i Sau, VÅ©ng TÃ u, sáng sớm, bá» biá»ƒn rá»™ng vÃ  Ã¡nh sÃ¡ng tự nhiên",
     "lá»‘i Ä‘i resort ven biá»ƒn ÄÃ  Náºµng, cÃ¢y cá» vÃ  Ã¡nh sÃ¡ng ban ngÃ y",
     "ban cÃ´ng resort PhÃº Quá»‘c nhÃ¬n ra biá»ƒn, Ã¡nh sÃ¡ng vÃ ng cuá»‘i chiá»u",
 ]
 BEACH_POSES = [
-    "Ä‘i bá»™ cháº­m dá»c bá» biá»ƒn rá»“i nhÃ¬n sang mÃ¡y quay",
-    "Ä‘á»©ng gÃ³c ba pháº§n tÆ° gáº§n hÃ ng dá»«a, tÃ³c chuyá»ƒn Ä‘á»™ng nháº¹ theo giÃ³",
-    "tá»±a nháº¹ lan can lá»‘i Ä‘i ven biá»ƒn vÃ  nhÃ¬n ra máº·t nÆ°á»›c",
-    "cáº§m chai nÆ°á»›c, bÆ°á»›c cháº­m trÃªn lá»‘i Ä‘i resort",
-    "Ä‘á»©ng toÃ n thÃ¢n trÃªn cÃ¡t khÃ´, xoay nháº¹ vai vá» phÃ­a mÃ¡y quay",
+    "Ä‘i bá»™ cháº­m dá»c bá» biá»ƒn rồi nhìn sang máy quay",
+    "Ä‘á»©ng góc ba phần tư gáº§n hÃ ng dá»«a, tÃ³c chuyá»ƒn Ä‘á»™ng nhẹ theo giÃ³",
+    "tựa nhẹ lan can lá»‘i Ä‘i ven biá»ƒn vÃ  nhÃ¬n ra máº·t nÆ°á»›c",
+    "cáº§m chai nÆ°á»›c, bước cháº­m trÃªn lá»‘i Ä‘i resort",
+    "Ä‘á»©ng toÃ n thÃ¢n trÃªn cÃ¡t khÃ´, xoay nhẹ vai vá» phÃ­a máy quay",
 ]
 BEACH_OUTFITS = [
     "Ã¡o tank top Ã´m dÃ¡ng mÃ u tráº¯ng + quáº§n short be sÃ¡ng, phong cÃ¡ch biá»ƒn nÄƒng Ä‘á»™ng vÃ  opaque",
     "Ã¡o crop top xanh baby + quáº§n short tráº¯ng, outfit hÃ¨ kÃ­n Ä‘Ã¡o vÃ  khÃ´ng xuyÃªn tháº¥u",
     "Ã¡o halter pastel + quáº§n short cáº¡p cao mÃ u kem, phong cÃ¡ch resort nÄƒng Ä‘á»™ng",
-    "Ã¡o sÃ¡t nÃ¡ch coral + quáº§n short tráº¯ng, outfit mÃ¹a hÃ¨ nháº¹ vÃ  opaque",
+    "Ã¡o sÃ¡t nÃ¡ch coral + quáº§n short tráº¯ng, outfit mÃ¹a hÃ¨ nhẹ vÃ  opaque",
 ]
 
 def normalize_scene_mode(value: Any) -> str:
@@ -1774,7 +1774,7 @@ def prepare_profile_persona(profile_id: str) -> dict[str, Any]:
         d = dict(row)
         persona_path = str(d.get("persona_path") or d.get("persona_original_path") or d.get("persona_master_path") or "").strip()
         if not persona_path:
-            raise ValueError("Page Profile chÆ°a cÃ³ áº£nh FRONT/original Ä‘á»ƒ rebuild")
+            raise ValueError("Page Profile chưa có áº£nh FRONT/original Ä‘á»ƒ rebuild")
         prepared = prepare_persona_assets(persona_path, profile_id, left_path=d.get("persona_left_path"), right_path=d.get("persona_right_path"), back_path=d.get("persona_back_path"))
         c.execute(
             "UPDATE page_profiles SET persona_original_path=?,persona_face_crop_path=?,persona_bust_path=?,persona_master_path=?,persona_left_master_path=?,persona_right_master_path=?,persona_back_master_path=?,persona_prepared_at=?,updated_at=? WHERE id=?",
@@ -1885,7 +1885,7 @@ def delete_persona_angle(profile_id: str, angle: str) -> dict[str, Any]:
     if angle not in {"left","right","back"}:
         raise ValueError("GÃ³c khÃ´ng há»£p lá»‡")
     if find_active_persona_angle_job(profile_id, angle):
-        raise RuntimeError(f"GÃ³c {angle} Ä‘ang generate; chá» job xong rá»“i xÃ³a")
+        raise RuntimeError(f"GÃ³c {angle} Ä‘ang generate; chá» job xong rồi xÃ³a")
     profile=get_page_profile(profile_id)
     if not profile:
         raise ValueError("KhÃ´ng tháº¥y Page Profile")
@@ -1911,7 +1911,7 @@ def set_persona_angle_enabled(profile_id: str, angle: str, enabled: bool) -> dic
     if not profile:
         raise ValueError("KhÃ´ng tháº¥y Page Profile")
     if enabled and not profile.get(f"persona_{angle}_master_path"):
-        raise ValueError(f"GÃ³c {angle} chÆ°a cÃ³ áº£nh Ä‘á»ƒ dÃ¹ng")
+        raise ValueError(f"GÃ³c {angle} chưa có áº£nh Ä‘á»ƒ dÃ¹ng")
     with conn() as c:
         c.execute(f"UPDATE page_profiles SET persona_{angle}_enabled=?,updated_at=? WHERE id=?",(1 if enabled else 0,utcnow(),profile_id))
     return get_page_profile(profile_id) or {}
@@ -2201,7 +2201,7 @@ def fallback_content_plan(profile: dict[str, Any], *, theme: str, body: str, sex
     bg = random.choice(background_pool)
     pose = random.choice(pose_pool)
     title_hint = str(profile.get("title_hint") or profile.get("theme") or profile.get("name") or "")
-    sexy_word = "cuá»‘n hÃºt" if sexy_level >= 70 else "nÄƒng Ä‘á»™ng" if sexy_level >= 45 else "nháº¹ nhÃ ng"
+    sexy_word = "cuá»‘n hÃºt" if sexy_level >= 70 else "nÄƒng Ä‘á»™ng" if sexy_level >= 45 else "nhẹ nhÃ ng"
     title = f"{title_hint or profile.get('name')}: {sexy_word} má»—i ngÃ y"[:98]
     hashtags = ["#reels", "#viral", "#fyp", "#vietnam", "#lifestyle", "#fashion"]
     caption = f"{sexy_word.title()} vibe hÃ´m nay âœ¨ {theme}. Outfit: {outfit}. {profile.get('name')} giá»¯ Ä‘Ãºng gÆ°Æ¡ng máº·t, Ä‘á»•i outfit vÃ  background Ä‘á»ƒ video Ä‘a dáº¡ng hÆ¡n. {' '.join(hashtags)}"
@@ -2331,6 +2331,34 @@ def _synth_hard_beat_wav(path: Path, *, bpm: int, seconds: int, seed: int) -> No
         wf.setnchannels(2); wf.setsampwidth(2); wf.setframerate(sr); wf.writeframes(pcm.tobytes())
 
 
+def _clean_prompt_mojibake(text: str) -> str:
+    if not text or not isinstance(text, str):
+        return ""
+    s = text
+    if any(k in s for k in ("Ã", "Â", "Ä", "Ã¢", "Ã£", "Ã¨", "Ã©", "Ãª", "Ã¬", "Ã­", "Ã²", "Ã³", "Ã´", "Ãµ", "Ã¹", "Ãº", "Ã½", "áº", "á»", "Æ")):
+        repls = [
+            ("bÃ£i biá»ƒn", "bãi biển"), ("Má»¹ KhÃª", "Mỹ Khê"), ("ÄÃ  Náºµng", "Đà Nẵng"),
+            ("sÃ¡ng sá»›m", "sáng sớm"), ("hoáº·c", "hoặc"), ("tá»± nhiÃªn", "tự nhiên"),
+            ("khÃ´ng gian", "không gian"), ("khÃ´ng pháº£i", "không phải"), ("phÃ²ng gym", "phòng gym"),
+            ("Cáº§u Rá»“ng", "Cầu Rồng"), ("sÃ´ng HÃ n", "sông Hàn"), ("buá»•i tá»‘i", "buổi tối"),
+            ("Ã¡nh Ä‘Ã¨n", "ánh đèn"), ("thÃ nh phá»‘", "thành phố"), ("tá»±a nháº¹", "tựa nhẹ"),
+            ("bá» tÆ°á»ng", "bờ tường"), ("gÃ³c ba pháº§n tÆ°", "góc ba phần tư"), ("cÃ´ng viÃªn", "công viên"),
+            ("vá»›i", "với"), ("phÃa sau", "phía sau"), ("BÃ¬nh Tháº¡nh", "Bình Thạnh"),
+            ("ngá»“i trÃªn", "ngồi trên"), ("gháº¿", "ghế"), ("tÆ° tháº¿", "tư thế"),
+            ("thÆ° giÃ£n", "thư giãn"), ("bÆ°á»›c", "bước"), ("cháºm", "chậm"),
+            ("trÃªn phá»‘", "trên phố"), ("nhÃ¬n sang", "nhìn sang"), ("mÃ¡y quay", "máy quay"),
+            ("Báº¿n Ninh Kiá»u", "Bến Ninh Kiều"), ("Cáº§n ThÆ¡", "Cần Thơ"), ("chiá»u tá»‘i", "chiều tối"),
+            ("sÃ´ng Háºu", "sông Hậu"), ("cáº§m ly", "cầm ly"), ("cÃ  phÃª", "cà phê"),
+            ("mang Ä‘i", "mang đi"), ("chá»‰nh tÃ³c", "chỉnh tóc"), ("má»™t láº§n", "một lần"),
+            ("rá»“i", "rồi"), ("má»‰m cÆ°á»i", "mỉm cười"), ("nháº¹", "nhẹ"),
+            ("chÆ°a cÃ³", "chưa có"), ("khÃ´ng tá»“n táº¡i", "không tồn tại"),
+            ("ÄÃ ", "Đà "), ("ÄÃ", "Đá"), ("Äa", "Đa"),
+        ]
+        for bad, good in repls:
+            s = s.replace(bad, good)
+    return s
+
+
 def _generate_auto_music_track(profile_id: str, *, variant: int=0) -> str:
     dest=_profile_music_dir(profile_id)
     bpms=[136,144,152,160,148]; bpm=bpms[int(variant)%len(bpms)]
@@ -2407,13 +2435,15 @@ def _factory_meta(profile: dict[str, Any], run_id: str, final_index: int, mode: 
 def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest, run_id: str, final_index: int, mode: str) -> tuple[list[dict[str, Any]], dict[str, Any], str]:
     persona = str(profile.get("persona_master_path") or profile.get("persona_path") or "").strip()
     if not persona:
-        raise ValueError(f"Page '{profile['name']}' chÆ°a cÃ³ persona master")
+        raise ValueError(f"Page '{profile['name']}' chưa có persona master")
     if not Path(persona).exists():
-        raise ValueError(f"Persona master khÃ´ng tá»“n táº¡i: {persona}")
+        raise ValueError(f"Persona master không tồn tại: {persona}")
 
     body = BODY_PRESETS.get(profile.get("body_preset") or "curvy_fit", BODY_PRESETS["curvy_fit"])
     sexy = _sexiness_clause(int(profile.get("sexiness_level") or 60))
     scene_mode, backgrounds, poses, outfit_prompts, scene_motions, resolved_scene = _resolve_scene_pools(profile)
+    backgrounds = [_clean_prompt_mojibake(bg) for bg in backgrounds]
+    poses = [_clean_prompt_mojibake(p) for p in poses]
     scene_mix = _scene_mode_cfg(profile)[1]
     scene_lock = _scene_lock_clause(resolved_scene)
     music_candidates=_clean_list(profile.get("music_paths"))
@@ -2457,8 +2487,8 @@ def build_factory_v2_job(profile: dict[str, Any], req: FactoryV2GenerateRequest,
     })
 
     scenes: list[dict[str, Any]] = []
-    preferred_bg = str(plan.get("background") or "").strip()
-    preferred_pose = str(plan.get("pose") or "").strip()
+    preferred_bg = _clean_prompt_mojibake(str(plan.get("background") or "").strip())
+    preferred_pose = _clean_prompt_mojibake(str(plan.get("pose") or "").strip())
     bg_order = random.sample(backgrounds, min(len(backgrounds), count)) if len(backgrounds) >= count else [random.choice(backgrounds) for _ in range(count)]
     pose_order = random.sample(poses, min(len(poses), count)) if len(poses) >= count else [random.choice(poses) for _ in range(count)]
     if preferred_bg:
@@ -3264,7 +3294,7 @@ def scheduler_status(profile_id: str) -> dict[str, Any]:
         "generation_block_reason": (
             f"FLOW UI BREAKER {int(ui_breaker.get('seconds') or 0)}s Â· khÃ´ng spam thao tÃ¡c browser Â· tá»± thá»­ láº¡i sau cooldown."
             if ui_breaker.get('blocked') else
-            (f"AUTO RECOVERY cooldown {int(circuit.get('cooldown_seconds') or 0)}s rá»“i tá»± thá»­ láº¡i." if circuit.get("blocked") else None)
+            (f"AUTO RECOVERY cooldown {int(circuit.get('cooldown_seconds') or 0)}s rồi tá»± thá»­ láº¡i." if circuit.get("blocked") else None)
         ),
         "flow_ui_breaker_until": ui_breaker.get('until'),
         "flow_ui_breaker_seconds": int(ui_breaker.get('seconds') or 0),
@@ -3590,7 +3620,7 @@ async def _scheduler_fill_profile_unlocked(profile_id: str, force_count: int | N
     if circuit.get('blocked'):
         sec=int(circuit.get('cooldown_seconds') or 0)
         _scheduler_state_event(profile_id,'AUTO_COOLDOWN',f"AUTO váº«n báº­t Â· táº¡m nghá»‰ {sec}s sau {circuit.get('count')} lá»—i gáº§n Ä‘Ã¢y; háº¿t cooldown tá»± thá»­ láº¡i.")
-        return {'created':0,'active_before':active,'target':target,'jobs':[],'blocked':True,'reason':'auto_recovery_cooldown','cooldown_seconds':sec,'recent_failures':circuit.get('count',0),'message':f'AUTO cooldown {sec}s rá»“i tá»± cháº¡y láº¡i.'}
+        return {'created':0,'active_before':active,'target':target,'jobs':[],'blocked':True,'reason':'auto_recovery_cooldown','cooldown_seconds':sec,'recent_failures':circuit.get('count',0),'message':f'AUTO cooldown {sec}s rồi tá»± cháº¡y láº¡i.'}
 
     _scheduler_state_event(
         profile_id,'ACTIVE',
@@ -4744,7 +4774,7 @@ def download_signed_video_sync(url: str, job_id: str, scene_id: int, media_id: s
     from urllib.parse import urlparse
     parsed = urlparse(str(url or ""))
     if parsed.scheme not in {"https", "http"}:
-        raise RuntimeError("Signed video URL khÃ´ng pháº£i HTTP/HTTPS.")
+        raise RuntimeError("Signed video URL không phải HTTP/HTTPS.")
     if parsed.scheme == "http" and parsed.hostname not in {"127.0.0.1", "localhost"}:
         raise RuntimeError("Tá»« chá»‘i signed video URL HTTP khÃ´ng-local.")
 
@@ -4767,7 +4797,7 @@ def download_signed_video_sync(url: str, job_id: str, scene_id: int, media_id: s
             r.raise_for_status()
             content_type = (r.headers.get("content-type") or "").split(";", 1)[0].strip().lower()
             if content_type.startswith("text/") or "json" in content_type or "html" in content_type:
-                raise RuntimeError(f"Signed URL tráº£ content-type khÃ´ng pháº£i video: {content_type or 'unknown'}")
+                raise RuntimeError(f"Signed URL tráº£ content-type không phải video: {content_type or 'unknown'}")
             expected = int(r.headers.get("content-length") or 0)
             with tmp.open("wb") as f:
                 for chunk in r.iter_content(512 * 1024):
@@ -4775,9 +4805,9 @@ def download_signed_video_sync(url: str, job_id: str, scene_id: int, media_id: s
                         f.write(chunk)
                         total += len(chunk)
             if total <= 4096:
-                raise RuntimeError(f"Video táº£i vá» quÃ¡ nhá»: {total} bytes")
+                raise RuntimeError(f"Video tải vá» quÃ¡ nhá»: {total} bytes")
             if expected > 0 and total != expected:
-                raise RuntimeError(f"Video táº£i chÆ°a Ä‘á»§: {total}/{expected} bytes")
+                raise RuntimeError(f"Video tải chÆ°a Ä‘á»§: {total}/{expected} bytes")
         final.unlink(missing_ok=True)
         tmp.replace(final)
         return str(final.resolve()), total, content_type or "video/mp4"
@@ -5300,10 +5330,10 @@ async def lifespan(app: FastAPI):
             # of sitting forever at 'Waiting for application startup'.
             await asyncio.wait_for(asyncio.to_thread(init_db), timeout=12.0)
         except asyncio.TimeoutError as exc:
-            raise RuntimeError("SQLite startup quÃ¡ 12 giÃ¢y. CÃ³ thá»ƒ cÃ²n server cÅ© Ä‘ang giá»¯ DB. HÃ£y Ä‘Ã³ng process Python cÅ© rá»“i cháº¡y láº¡i.") from exc
+            raise RuntimeError("SQLite startup quÃ¡ 12 giÃ¢y. CÃ³ thá»ƒ cÃ²n server cÅ© Ä‘ang giá»¯ DB. HÃ£y Ä‘Ã³ng process Python cÅ© rồi cháº¡y láº¡i.") from exc
         except sqlite3.OperationalError as exc:
             if "locked" in str(exc).lower() or "busy" in str(exc).lower():
-                raise RuntimeError("SQLite Ä‘ang bá»‹ khÃ³a bá»Ÿi process server khÃ¡c. ÄÃ³ng server/Python cÅ© rá»“i cháº¡y láº¡i.") from exc
+                raise RuntimeError("SQLite Ä‘ang bá»‹ khÃ³a bá»Ÿi process server khÃ¡c. ÄÃ³ng server/Python cÅ© rồi cháº¡y láº¡i.") from exc
             raise
         print("[STARTUP 2/5] SQLite OK", flush=True)
 
@@ -5527,7 +5557,7 @@ async def upload_file(file: UploadFile = File(...)):
             image_meta = {"image_valid": True, "width": int(width), "height": int(height), "format": fmt}
         except Exception as exc:
             dest.unlink(missing_ok=True)
-            raise HTTPException(400, f"áº¢nh upload khÃ´ng há»£p lá»‡ hoáº·c khÃ´ng Ä‘á»c Ä‘Æ°á»£c: {exc}")
+            raise HTTPException(400, f"áº¢nh upload khÃ´ng há»£p lá»‡ hoặc khÃ´ng Ä‘á»c Ä‘Æ°á»£c: {exc}")
 
     sha256 = hashlib.sha256(dest.read_bytes()).hexdigest()
     return {"ok": True, "path": str(dest.resolve()), "name": safe_name, "size": size, "sha256": sha256, **image_meta}
@@ -5633,7 +5663,7 @@ def download_test_status() -> dict[str, Any]:
 async def download_test_latest(source_job_id: str | None = None, timeout_sec: int = 180) -> dict[str, Any]:
     source = get_flow_job(source_job_id) if source_job_id else _latest_job_with_video_media()
     if not source:
-        raise HTTPException(404, "ChÆ°a tÃ¬m tháº¥y job Flow nÃ o cÃ³ videoMediaId Ä‘á»ƒ test táº£i.")
+        raise HTTPException(404, "ChÆ°a tÃ¬m tháº¥y job Flow nÃ o cÃ³ videoMediaId Ä‘á»ƒ test tải.")
     media_map = _video_media_map_from_job(source)
     if not media_map:
         raise HTTPException(400, "Job Ä‘Æ°á»£c chá»n khÃ´ng cÃ³ videoMediaId.")
@@ -5867,7 +5897,7 @@ def _probe_audio_file(path: Path) -> dict[str, Any]:
     streams = data.get("streams") or []
     audio_streams = [s for s in streams if str(s.get("codec_type") or "") == "audio"]
     if not audio_streams:
-        raise RuntimeError("File táº£i vá» khÃ´ng cÃ³ audio stream")
+        raise RuntimeError("File tải vá» khÃ´ng cÃ³ audio stream")
     try:
         duration = float((data.get("format") or {}).get("duration") or 0)
     except Exception:
@@ -5958,7 +5988,7 @@ def _download_public_music_url(profile_id: str, url: str) -> dict[str, Any]:
         raise KeyError(profile_id)
     ok, host = _music_host_allowed(url)
     if not ok:
-        raise ValueError("Chá»‰ nháº­n HTTPS URL cÃ´ng khai tá»« TikTok hoáº·c CapCut")
+        raise ValueError("Chá»‰ nháº­n HTTPS URL cÃ´ng khai tá»« TikTok hoặc CapCut")
 
     # Use the same Python/venv, not an arbitrary PATH executable.
     try:
@@ -6022,7 +6052,7 @@ def _download_public_music_url(profile_id: str, url: str) -> dict[str, Any]:
     size = path.stat().st_size
     if size <= 0 or size > 40 * 1024 * 1024:
         path.unlink(missing_ok=True)
-        raise RuntimeError(f"MP3 vÆ°á»£t giá»›i háº¡n hoáº·c rá»—ng: {size} bytes")
+        raise RuntimeError(f"MP3 vÆ°á»£t giá»›i háº¡n hoặc rá»—ng: {size} bytes")
 
     probe = _probe_audio_file(path)
     sha = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -6116,9 +6146,9 @@ def page_profile_prepare_persona(profile_id: str):
         raise HTTPException(404, "KhÃ´ng tháº¥y Page Profile")
     source = str(profile.get("persona_path") or "").strip()
     if not source:
-        raise HTTPException(409, "Profile chÆ°a cÃ³ áº£nh FRONT gá»‘c. HÃ£y táº£i áº£nh FRONT rá»“i LÆ¯U Há»’ SÆ  trÆ°á»›c.")
+        raise HTTPException(409, "Profile chưa có áº£nh FRONT gá»‘c. HÃ£y tải áº£nh FRONT rồi LÆ¯U Há»’ SÆ  trÆ°á»›c.")
     if not Path(source).exists():
-        raise HTTPException(409, "áº¢nh FRONT gá»‘c khÃ´ng cÃ²n tá»“n táº¡i trÃªn server. HÃ£y táº£i láº¡i áº£nh FRONT rá»“i LÆ¯U Há»’ SÆ .")
+        raise HTTPException(409, "áº¢nh FRONT gá»‘c khÃ´ng cÃ²n tá»“n táº¡i trÃªn server. HÃ£y tải láº¡i áº£nh FRONT rồi LÆ¯U Há»’ SÆ .")
     try:
         return {"ok": True, "profile": prepare_profile_persona(profile_id)}
     except Exception as exc:
@@ -6459,7 +6489,7 @@ def factory_v2_runs(limit: int = 50):
 def qc_job(job_id: str):
     q = latest_qc(job_id)
     if not q:
-        raise HTTPException(404, "Job chÆ°a cÃ³ QC")
+        raise HTTPException(404, "Job chưa có QC")
     return q
 
 
@@ -6968,7 +6998,7 @@ async def simple_page_start(profile_id: str):
     if not profile:
         raise HTTPException(404, "KhÃ´ng tháº¥y cáº¥u hÃ¬nh Page")
     if not profile.get("facebook_page_id"):
-        raise HTTPException(400, "Há»“ sÆ¡ chÆ°a map Facebook Page. HÃ£y import token Page tÆ°Æ¡ng á»©ng hoáº·c chá»n Ä‘Ãºng Page rá»“i LÆ¯U PAGE.")
+        raise HTTPException(400, "Há»“ sÆ¡ chÆ°a map Facebook Page. HÃ£y import token Page tÆ°Æ¡ng á»©ng hoặc chá»n Ä‘Ãºng Page rồi LÆ¯U PAGE.")
     if not profile.get("persona_ready"):
         try:
             profile = await asyncio.to_thread(prepare_profile_persona, profile_id)
@@ -7295,7 +7325,7 @@ async def extension_ws(ws: WebSocket):
                 mid=str(msg.get("mediaId") or "")
                 signed_url=str(msg.get("url") or msg.get("signedUrl") or "")
                 if not jid or sid<=0 or not mid or not _safe_remote_media_url(signed_url):
-                    await ws.send_text(dumps({"type":"VIDEO_URL_DOWNLOAD_ACK","ok":False,"jobId":jid,"sceneId":sid,"mediaId":mid,"error":"Signed URL thiáº¿u/khÃ´ng pháº£i HTTPS"}))
+                    await ws.send_text(dumps({"type":"VIDEO_URL_DOWNLOAD_ACK","ok":False,"jobId":jid,"sceneId":sid,"mediaId":mid,"error":"Signed URL thiáº¿u/không phải HTTPS"}))
                     continue
                 # STREAM-FIRST: save URL immediately. Do NOT download child video unless FFmpeg later needs fallback.
                 with conn() as c:
@@ -7354,7 +7384,7 @@ async def extension_ws(ws: WebSocket):
                         c.execute("UPDATE assets SET local_path=?,metadata_json=? WHERE id=?",(str(final_path.resolve()),_merge_metadata_json(row["metadata_json"],{"source":"WS_BINARY_TRANSFER","size":actual_size}),row["id"]))
                     else:
                         add_asset(jid,sid,"video",local_path=str(final_path.resolve()),media_id=mid,metadata={"source":"WS_BINARY_TRANSFER","size":actual_size})
-                persist_event_log({"type":"VIDEO_FILE_READY","jobId":jid,"sceneId":sid,"message":f"Video táº£i tháº³ng vÃ o server Â· scene {sid} Â· {actual_size} bytes"})
+                persist_event_log({"type":"VIDEO_FILE_READY","jobId":jid,"sceneId":sid,"message":f"Video tải tháº³ng vÃ o server Â· scene {sid} Â· {actual_size} bytes"})
                 await ui_broadcast({"type":"VIDEO_FILE_READY","jobId":jid,"sceneId":sid,"localPath":str(final_path.resolve())})
                 await ws.send_text(dumps({"type":"VIDEO_UPLOAD_ACK","ok":True,"jobId":jid,"sceneId":sid,"mediaId":mid,"size":actual_size,"localPath":str(final_path.resolve())}))
             elif mtype == "FLOW_JOB_ACCEPTED":
@@ -7552,7 +7582,7 @@ async def serve_dual_port() -> None:
         if web_task.done():
             await web_task
             if not web_server.started:
-                raise RuntimeError("Uvicorn startup tháº¥t báº¡i. Xem lá»—i ngay phÃ­a trÃªn / server_crash.log.")
+                raise RuntimeError("Uvicorn startup thất bại. Xem lá»—i ngay phÃ­a trÃªn / server_crash.log.")
             return
         await asyncio.sleep(0.05)
 
