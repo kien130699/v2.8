@@ -233,6 +233,9 @@ class SmartTestAgent:
         final_state = None
         deadlock_recovered = False
 
+        last_log_id = 0
+        seen_cps: set[str] = set()
+
         while time.time() - start < self.timeout:
             now = time.time()
             run_data = request_json("GET", f"{self.base_url}/api/runs/{run_id}")
@@ -249,6 +252,21 @@ class SmartTestAgent:
                 last_status = st
                 last_progress_val = prog
                 last_progress_at = now
+
+            # Stream live server event logs for this run
+            new_logs = query_db("SELECT id, kind, level, message FROM event_logs WHERE (run_id=? OR message LIKE ?) AND id > ? ORDER BY id ASC",
+                                (run_id, f"%{run_id}%", last_log_id))
+            for lg in new_logs:
+                last_log_id = max(last_log_id, int(lg["id"]))
+                self.log(f"JOB-{seq:02d}", f"👉 [{lg['kind'].upper()}] {lg['message']}")
+
+            # Stream live scene checkpoints
+            cur_cps = query_db("SELECT scene_id, status, attempt_id, output_path FROM scene_checkpoints WHERE run_id=?", (run_id,))
+            for cp in cur_cps:
+                cp_key = f"{cp.get('scene_id')}_{cp.get('status')}_{cp.get('attempt_id')}"
+                if cp_key not in seen_cps:
+                    seen_cps.add(cp_key)
+                    self.log(f"JOB-{seq:02d}", f"🎬 CHECKPOINT: Scene {cp.get('scene_id')} -> {cp.get('status')} (Attempt {cp.get('attempt_id')})", level="SUCCESS")
 
             # Watchdog 1: Deadlock detection when waiting_engine
             if st == "waiting_engine" and (now - start > 10.0) and not deadlock_recovered:

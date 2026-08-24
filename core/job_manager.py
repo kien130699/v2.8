@@ -709,85 +709,68 @@ class JobManager:
         if not plugin:
             self._update_run(run_id, status="failed", error="Plugin không tồn tại", finished_at=db.now_iso())
             return
-        engine_lock_key = str(plugin.engine or plugin.id)
-        lock = self._engine_locks.setdefault(engine_lock_key, asyncio.Lock())
         heartbeat = asyncio.create_task(self._run_heartbeat(run_id), name=f"heartbeat-{run_id}")
         try:
-            # Claim logic serializes each engine type in SQLite. The in-memory lock is only
-            # a final safety net. Never park a DB worker indefinitely on an asyncio.Lock.
-            if lock.locked():
-                owner = self._engine_owners.get(engine_lock_key) or "unknown"
-                self._update_run(run_id, status="waiting_engine", worker_id=None, error=f"engine {plugin.slug} lock báº­n bá»Ÿi {owner}")
-                db.log_event(f"WAIT ENGINE {run_id} · {plugin.slug} lock owner={owner}", kind="job", instance_id=instance["id"], run_id=run_id)
-                self._run_queue_event.set()
+            latest = self.get_run(run_id)
+            if not latest or str(latest.get("status") or "") != "dispatching":
                 return
-            await lock.acquire()
-            self._engine_owners[engine_lock_key] = run_id
+            self._update_run(run_id, status="preparing", started_at=db.now_iso(), heartbeat_at=db.now_iso(), error=None)
+            _safe_print(f"[V2.8 JOB] START {instance['id']} · {run_id} · {plugin.slug}", flush=True)
+            db.log_event(f"{instance['id']} prepare → {plugin.slug}", kind="job", instance_id=instance["id"], run_id=run_id)
+            resume_jid = str(latest.get("engine_run_id") or "").strip() or None
             try:
-                latest = self.get_run(run_id)
-                if not latest or str(latest.get("status") or "") != "dispatching":
-                    return
-                self._update_run(run_id, status="preparing", started_at=db.now_iso(), heartbeat_at=db.now_iso(), error=None)
-                _safe_print(f"[V2.8 JOB] START {instance['id']} · {run_id} · {plugin.slug}", flush=True)
-                db.log_event(f"{instance['id']} prepare → {plugin.slug}", kind="job", instance_id=instance["id"], run_id=run_id)
-                resume_jid = str(latest.get("engine_run_id") or "").strip() or None
-                try:
-                    started = await plugin.adapter.start(self, instance, resume_job_id=resume_jid)
-                except TypeError:
-                    started = await plugin.adapter.start(self, instance)
-                server_features.step(run_id, "flow", "running", str(started.get("engine_run_id") or "engine started"))
-                self._update_run(
-                    run_id, status="running", engine_run_id=started.get("engine_run_id"),
-                    engine_job_ids=started.get("engine_job_ids") or [], output={"engine_start": started},
-                )
-                db.log_event(f"{instance['id']} engine started · {started.get('engine_run_id')}", kind="job", instance_id=instance["id"], run_id=run_id)
-                _safe_print(f"[V2.8 JOB] ENGINE {instance['id']} · {started.get('engine_run_id')}", flush=True)
-                result = await plugin.adapter.wait(self, instance, started)
-                server_features.step(run_id, "download", "done", "Engine returned media paths")
-                server_features.step(run_id, "merge", "done", "Engine render completed")
-                videos = [str(Path(str(x)).resolve()) for x in result.get("video_paths") or [] if x]
-                if not videos:
-                    raise RuntimeError("Engine báo xong nhưng không có video output")
-                missing = [x for x in videos if not Path(x).is_file() or Path(x).stat().st_size < 1024]
-                if missing:
-                    raise RuntimeError(f"Engine trả output không tồn tại/rỗng: {missing[:3]}")
-                validation = server_features.validate_output(videos, min_seconds=4.0, max_seconds=180.0)
-                server_features.step(run_id, "validate", "done" if validation.get("ok") else "failed", "Output validator", validation)
-                if not validation.get("ok"):
-                    raise RuntimeError(f"Output validator failed: {validation}")
-                for idx, video_path in enumerate(videos, 1):
-                    server_features.checkpoint(run_id, f"video_{idx}", "final", "done", output_path=video_path, payload={"validator": validation.get("checks", [])[idx-1] if idx-1 < len(validation.get("checks", [])) else {}})
-                title = str(result.get("title") or instance["name"])
-                caption = server_features.enforce_caption_affiliate(str(result.get("caption") or ""), instance["config"])
-                server_features.step(run_id, "caption", "done", "Caption checked affiliate_url")
-                output = {"video_paths": videos, "engine": result.get("raw") or {}, "render_once": True, "validation": validation}
-                self._update_run(run_id, status="rendered", output=output, title=title, caption=caption)
-                pages = [p for p in self.instance_pages(instance["id"]) if p.get("enabled") and p.get("page_enabled")]
-                server_features.step(run_id, "publish", "queued" if pages else "skipped", f"{len(pages)} page(s)")
-                if not pages:
-                    self._update_run(run_id, status="done_no_pages", finished_at=db.now_iso())
-                    db.log_event(f"{instance['id']} render xong · chưa gắn Page", kind="job", instance_id=instance["id"], run_id=run_id)
-                    return
-                dry_run = bool(instance["config"].get("facebook_dry_run", False))
-                now = datetime.now(timezone.utc)
-                for p in pages:
-                    suffix = str(p.get("caption_suffix") or "").strip()
-                    desc = (caption + ("\n\n" + suffix if suffix else "")).strip()
-                    delay = max(0, int(p.get("publish_delay_seconds") or 0))
-                    for idx, path in enumerate(videos):
-                        pid = facebook.enqueue_publish(run_id, p["page_id"], path, title, desc, dry_run=dry_run)
-                        if delay or idx:
-                            retry_at = (now + timedelta(seconds=delay + idx * 10)).isoformat(timespec="seconds")
-                            with db.connect() as c:
-                                c.execute("UPDATE publish_jobs SET status='retry_wait',retry_after=?,updated_at=? WHERE id=?", (retry_at, db.now_iso(), pid))
-                self._update_run(run_id, status="publish_queued")
-                db.log_event(f"{instance['id']} render 1 lần → queue {len(pages)} Page", kind="facebook", instance_id=instance["id"], run_id=run_id, payload={"pages": [p["page_id"] for p in pages], "videos": len(videos)})
-            finally:
-                if self._engine_owners.get(engine_lock_key) == run_id:
-                    self._engine_owners.pop(engine_lock_key, None)
-                if lock.locked():
-                    lock.release()
-                self._run_queue_event.set()
+                started = await plugin.adapter.start(self, instance, resume_job_id=resume_jid)
+            except TypeError:
+                started = await plugin.adapter.start(self, instance)
+            server_features.step(run_id, "flow", "running", str(started.get("engine_run_id") or "engine started"))
+            self._update_run(
+                run_id, status="running", engine_run_id=started.get("engine_run_id"),
+                engine_job_ids=started.get("engine_job_ids") or [], output={"engine_start": started},
+            )
+            db.log_event(f"{instance['id']} engine started · {started.get('engine_run_id')}", kind="job", instance_id=instance["id"], run_id=run_id)
+            _safe_print(f"[V2.8 JOB] ENGINE {instance['id']} · {started.get('engine_run_id')}", flush=True)
+            result = await plugin.adapter.wait(self, instance, started)
+            server_features.step(run_id, "download", "done", "Engine returned media paths")
+            server_features.step(run_id, "merge", "done", "Engine render completed")
+            videos = [str(Path(str(x)).resolve()) for x in result.get("video_paths") or [] if x]
+            if not videos:
+                raise RuntimeError("Engine báo xong nhưng không có video output")
+            missing = [x for x in videos if not Path(x).is_file() or Path(x).stat().st_size < 1024]
+            if missing:
+                raise RuntimeError(f"Engine trả output không tồn tại/rỗng: {missing[:3]}")
+            validation = server_features.validate_output(videos, min_seconds=4.0, max_seconds=180.0)
+            server_features.step(run_id, "validate", "done" if validation.get("ok") else "failed", "Output validator", validation)
+            if not validation.get("ok"):
+                raise RuntimeError(f"Output validator failed: {validation}")
+            for idx, video_path in enumerate(videos, 1):
+                server_features.checkpoint(run_id, f"video_{idx}", "final", "done", output_path=video_path, payload={"validator": validation.get("checks", [])[idx-1] if idx-1 < len(validation.get("checks", [])) else {}})
+            title = str(result.get("title") or instance["name"])
+            caption = server_features.enforce_caption_affiliate(str(result.get("caption") or ""), instance["config"])
+            server_features.step(run_id, "caption", "done", "Caption checked affiliate_url")
+            output = {"video_paths": videos, "engine": result.get("raw") or {}, "render_once": True, "validation": validation}
+            self._update_run(run_id, status="rendered", output=output, title=title, caption=caption)
+            pages = [p for p in self.instance_pages(instance["id"]) if p.get("enabled") and p.get("page_enabled")]
+            server_features.step(run_id, "publish", "queued" if pages else "skipped", f"{len(pages)} page(s)")
+            if not pages:
+                self._update_run(run_id, status="done_no_pages", finished_at=db.now_iso())
+                db.log_event(f"{instance['id']} render xong · chưa gắn Page", kind="job", instance_id=instance["id"], run_id=run_id)
+                return
+            dry_run = bool(instance["config"].get("facebook_dry_run", False))
+            now = datetime.now(timezone.utc)
+            for p in pages:
+                suffix = str(p.get("caption_suffix") or "").strip()
+                desc = (caption + ("\n\n" + suffix if suffix else "")).strip()
+                delay = max(0, int(p.get("publish_delay_seconds") or 0))
+                for idx, path in enumerate(videos):
+                    pid = facebook.enqueue_publish(run_id, p["page_id"], path, title, desc, dry_run=dry_run)
+                    if delay or idx:
+                        retry_at = (now + timedelta(seconds=delay + idx * 10)).isoformat(timespec="seconds")
+                        with db.connect() as c:
+                            c.execute("UPDATE publish_jobs SET status='retry_wait',retry_after=?,updated_at=? WHERE id=?", (retry_at, db.now_iso(), pid))
+            self._update_run(run_id, status="publish_queued")
+            db.log_event(f"{instance['id']} render 1 lần → queue {len(pages)} Page", kind="facebook", instance_id=instance["id"], run_id=run_id, payload={"pages": [p["page_id"] for p in pages], "videos": len(videos)})
+        finally:
+            self._run_queue_event.set()
         except asyncio.CancelledError:
             self._update_run(run_id, status="interrupted", error="Task cancelled", finished_at=db.now_iso())
             raise
