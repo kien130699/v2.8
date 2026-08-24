@@ -8,7 +8,7 @@ from core import server_features
 
 
 class Adapter:
-    async def start(self, manager: Any, instance: dict[str, Any]) -> dict[str, Any]:
+    async def start(self, manager: Any, instance: dict[str, Any], resume_job_id: str | None = None) -> dict[str, Any]:
         config = dict(instance.get("config") or {})
         keyword = str(config.get("keyword") or "").strip()
         if not keyword:

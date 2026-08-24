@@ -270,6 +270,17 @@ def publish_one(pub_id: str) -> dict[str, Any]:
         _update_publish(pub_id, status="dry_run_ok", result_json=db.dumps({"preflight": preflight}))
         return {"ok": True, "dry_run": True, "preflight": preflight}
 
+    existing_vid = str(job.get("fb_video_id") or "")
+    if existing_vid and str(job.get("status") or "") in {"finishing", "retry_wait"}:
+        try:
+            finish = _finish_reel(page, existing_vid, str(job.get("title") or ""), str(job.get("description") or ""))
+            result = {"video_id": existing_vid, "upload": "resumed", "finish": finish, "preflight": preflight}
+            _update_publish(pub_id, status="published", result_json=db.dumps(result), error=None)
+            db.log_event(f"Facebook published (resumed) → {page['name']} · {existing_vid}", kind="facebook", run_id=job.get("run_id"), payload={"page_id": page["id"], "publish_id": pub_id})
+            return {"ok": True, **result}
+        except Exception:
+            pass
+
     try:
         _update_publish(pub_id, status="starting", error=None)
         start = request_json(

@@ -71,7 +71,7 @@ def _run_uvicorn() -> int:
         tee_out = TeeStream(original_out, CONSOLE_LOG)
         tee_err = TeeStream(original_err, CONSOLE_LOG)
         sys.stdout, sys.stderr = tee_out, tee_err
-        print(f"\n===== V2.8.5.9 SERVER START {datetime.now().astimezone().isoformat(timespec='seconds')} pid={os.getpid()} · FLOW_WORKER>=14.7.0 =====", flush=True)
+        print(f"\n===== V2.8.6.0 SERVER START {datetime.now().astimezone().isoformat(timespec='seconds')} pid={os.getpid()} · FLOW_WORKER>=14.8.0 =====", flush=True)
     except Exception:
         sys.stdout, sys.stderr = original_out, original_err
 

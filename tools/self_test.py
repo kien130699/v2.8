@@ -311,7 +311,7 @@ def main() -> None:
         test_console_guard()
     sup = (ROOT / "supervisor.py").read_text("utf-8")
     assert "server HALTED but supervisor stays alive" in sup and "CONSOLE_LOG" in sup
-    print("V2.8.5.9 SELF TEST OK")
+    print("V2.8.6.0 SELF TEST OK")
 
 
 if __name__ == "__main__":

@@ -357,7 +357,12 @@ class FlowBroker:
         # If extension is reporting running for an OLD / DIFFERENT job than current active:
         if ext_job and ext_job != x.job_id and age >= 15:
             return f"active stale mismatch: extension running old job {ext_job} while broker active is {x.job_id}"
-        # If extension is still executing this exact job, give it full time up to hard_limit
+        # Check if worker is running but progress hasn't updated for longer than videoTimeoutSec
+        last_prog = getattr(self, "active_last_progress_at", None) or x.started_at
+        progress_stale_limit = max(float(settings.get("videoTimeoutSec") or 900), 300.0)
+        if (now - last_prog) >= progress_stale_limit:
+            return f"active progress frozen: no progress update for {int(now - last_prog)}s (limit={int(progress_stale_limit)}s)"
+        # If extension is still executing this exact job and progress is fresh, allow it to continue
         if ext_job == x.job_id and ext_running:
             return None
         if age >= 60 and self.extension_ready(max_age=120) and not ext_running:
@@ -391,6 +396,7 @@ class FlowBroker:
         self.recent.append(done)
         self.job_routes.pop(done.job_id, None)
         self.active = None
+        self.active_last_progress_at = None
         self.active_stale_resets += 1
         self.last_active_stale = {
             "queueId": done.queue_id,
@@ -400,6 +406,15 @@ class FlowBroker:
             "finishedAt": done.finished_at,
         }
         db.log_event(f"Flow stale reset {done.source}/{done.job_id}: {reason}", level="WARNING", kind="flow")
+        fut = self.job_waiters.pop(done.job_id, None)
+        if fut and not fut.done():
+            fut.set_result({
+                "ok": False,
+                "jobId": done.job_id,
+                "video_paths": self.get_job_clips(done.job_id),
+                "status": "FAILED",
+                "error": f"Stale timeout: {reason}",
+            })
         await self._forward_source(done.source, {
             "type": "FLOW_JOB_INTERRUPTED",
             "ok": False,
@@ -409,7 +424,8 @@ class FlowBroker:
             "source": done.source,
         })
         if self.extension:
-            await self._send_ext({"type": "FLOW_CONTROL", "action": "stop", "reason": reason})
+            await self._send_ext({"type": "CANCEL_JOB", "jobId": done.job_id, "reason": reason})
+            await self._send_ext({"type": "FLOW_CONTROL", "action": "stop", "reason": reason, "jobId": done.job_id})
         self.event.set()
 
     async def _send_ext(self, msg: dict[str, Any]) -> bool:
@@ -452,12 +468,14 @@ class FlowBroker:
                     x = self._choose()
                     if x:
                         self.active = x
+                        self.active_last_progress_at = time.time()
                         x.status = "RUNNING"
                         x.started_at = time.time()
                         out = x.message if str(x.message.get("type") or "") == "DOWNLOAD_MEDIA_FILES" else self._apply_globals(x.message, x.source)
                         if not await self._send_ext(out):
                             x.status = "WAITING"
                             x.started_at = None
+                            self.active_last_progress_at = None
                             self.pending.appendleft(x)
                             self.active = None
                 self.event.clear()
@@ -629,6 +647,7 @@ class FlowBroker:
             return
         if typ == "FLOW_JOB_ACCEPTED":
             jid = str(msg.get("jobId") or "")
+            self.active_last_progress_at = time.time()
             if isinstance(self.extension_meta, dict):
                 self.extension_meta["runtime"] = {
                     "running": True,
@@ -650,6 +669,9 @@ class FlowBroker:
             running = bool(msg.get("running") if "running" in msg else raw_runtime.get("running"))
             server_job_id = msg.get("jobId") or msg.get("serverJobId") or raw_runtime.get("serverJobId") or raw_runtime.get("jobId")
             progress_label = msg.get("progressLabel") or msg.get("runtimeState") or raw_runtime.get("progressLabel") or raw_runtime.get("runtimeState")
+            old_label = (self.extension_meta.get("runtime") or {}).get("progressLabel") if isinstance(self.extension_meta, dict) else None
+            if progress_label and progress_label != old_label:
+                self.active_last_progress_at = time.time()
             if isinstance(self.extension_meta, dict):
                 self.extension_meta["runtime"] = {
                     "running": running,
@@ -673,6 +695,7 @@ class FlowBroker:
                 fut.set_result(msg)
             return
         if typ == "SCENE_CHECKPOINT":
+            self.active_last_progress_at = time.time()
             jid = str(msg.get("jobId") or "")
             sidx = int(msg.get("sceneIndex") or 0)
             sid = int(msg.get("sceneId") or sidx + 1)
@@ -685,6 +708,7 @@ class FlowBroker:
                                      video_media_id=vmid, status=status, progress=prog, error=err, payload=msg)
             return
         if typ == "MEDIA_ID_TRACKED":
+            self.active_last_progress_at = time.time()
             jid = str(msg.get("jobId") or "")
             sid = int(msg.get("sceneId") or 1)
             sidx = int(msg.get("sceneIndex") or (sid - 1))
@@ -694,6 +718,7 @@ class FlowBroker:
             db.save_scene_checkpoint(jid, sidx, scene_id=sid, video_media_id=mid, status="VIDEO_PENDING")
             return
         if typ == "VIDEO_FILE_READY":
+            self.active_last_progress_at = time.time()
             jid = str(msg.get("jobId") or "")
             sid = int(msg.get("sceneId") or 1)
             mid = str(msg.get("mediaId") or "")
@@ -852,8 +877,12 @@ class FlowBroker:
         except asyncio.TimeoutError:
             self.job_waiters.pop(jid, None)
             is_comp, fresh_clips = self.get_job_scene_clips(jid, expected_scenes)
-            if fresh_clips:
-                return {"ok": is_comp, "jobId": jid, "video_paths": fresh_clips, "status": "DONE" if is_comp else "PARTIAL", "error": None if is_comp else f"Timeout {timeout}s but {len(fresh_clips)}/{expected_scenes} scenes ready"}
+            if fresh_clips and is_comp:
+                return {"ok": True, "jobId": jid, "video_paths": fresh_clips, "status": "DONE", "error": None}
+            elif fresh_clips:
+                return {"ok": False, "jobId": jid, "video_paths": fresh_clips, "status": "PARTIAL", "error": f"Timeout {timeout}s but {len(fresh_clips)}/{expected_scenes} scenes ready"}
+            else:
+                return {"ok": False, "jobId": jid, "video_paths": [], "status": "TIMEOUT", "error": f"Timeout {timeout}s chờ job {jid}"}
         except Exception as exc:
             self.job_waiters.pop(jid, None)
             return {"ok": False, "jobId": jid, "video_paths": self.get_job_clips(jid), "status": "ERROR", "error": str(exc)}

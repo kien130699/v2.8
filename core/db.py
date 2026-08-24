@@ -253,6 +253,22 @@ def init_db() -> None:
         _add_column(c, "runs", "heartbeat_at TEXT")
         _add_column(c, "job_templates", "version INTEGER NOT NULL DEFAULT 1")
         _add_column(c, "job_instances", "template_version INTEGER NOT NULL DEFAULT 1")
+        
+        # Unify schema migrations for checkpoint tables across versions
+        _add_column(c, "flow_scene_checkpoints", "run_id TEXT")
+        _add_column(c, "flow_scene_checkpoints", "scene_key TEXT NOT NULL DEFAULT ''")
+        _add_column(c, "flow_scene_checkpoints", "output_path TEXT NOT NULL DEFAULT ''")
+        _add_column(c, "flow_scene_checkpoints", "attempts INTEGER NOT NULL DEFAULT 0")
+
+        _add_column(c, "scene_checkpoints", "job_id TEXT NOT NULL DEFAULT ''")
+        _add_column(c, "scene_checkpoints", "scene_index INTEGER NOT NULL DEFAULT 0")
+        _add_column(c, "scene_checkpoints", "scene_id INTEGER NOT NULL DEFAULT 1")
+        _add_column(c, "scene_checkpoints", "image_media_id TEXT")
+        _add_column(c, "scene_checkpoints", "video_media_id TEXT")
+        _add_column(c, "scene_checkpoints", "local_path TEXT NOT NULL DEFAULT ''")
+        _add_column(c, "scene_checkpoints", "progress INTEGER NOT NULL DEFAULT 0")
+        _add_column(c, "scene_checkpoints", "error TEXT")
+
         if "flow_outbox" in {str(r[0]) for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}:
             _add_column(c, "flow_outbox", "dedupe_key TEXT")
             c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_flow_outbox_dedupe ON flow_outbox(dedupe_key) WHERE dedupe_key IS NOT NULL")
@@ -363,7 +379,11 @@ def save_scene_checkpoint(job_id: str, scene_index: int, *, scene_id: int = 1,
                    image_media_id = COALESCE(excluded.image_media_id, flow_scene_checkpoints.image_media_id),
                    video_media_id = COALESCE(excluded.video_media_id, flow_scene_checkpoints.video_media_id),
                    local_path = COALESCE(excluded.local_path, flow_scene_checkpoints.local_path),
-                   status = excluded.status,
+                   status = CASE
+                       WHEN flow_scene_checkpoints.status IN ('DONE', 'COMPLETED', 'DOWNLOADED', 'ready') AND excluded.status IN ('RUNNING', 'PENDING', 'NOT_STARTED', 'SUBMITTED', 'queued', 'pending') THEN flow_scene_checkpoints.status
+                       WHEN flow_scene_checkpoints.status = 'FAILED' AND excluded.status IN ('RUNNING', 'PENDING', 'NOT_STARTED', 'queued', 'pending') THEN flow_scene_checkpoints.status
+                       ELSE excluded.status
+                   END,
                    progress = MAX(excluded.progress, flow_scene_checkpoints.progress),
                    error = excluded.error,
                    payload_json = CASE WHEN excluded.payload_json != '{}' THEN excluded.payload_json ELSE flow_scene_checkpoints.payload_json END,

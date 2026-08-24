@@ -5,7 +5,7 @@ class Adapter:
     async def prepare(self, manager: Any, instance: dict[str, Any]) -> str:
         return str(instance["config"].get("character_set_id") or "mother_girl_01")
 
-    async def start(self, manager: Any, instance: dict[str, Any]) -> dict[str, Any]:
+    async def start(self, manager: Any, instance: dict[str, Any], resume_job_id: str | None = None) -> dict[str, Any]:
         return await manager.engine.run_parenting(instance["config"], instance["id"], instance["name"])
 
     async def wait(self, manager: Any, instance: dict[str, Any], started: dict[str, Any]) -> dict[str, Any]:

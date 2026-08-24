@@ -202,7 +202,9 @@ Trả về DUY NHẤT một JSON hợp lệ:
                 "videoConcurrency": 1
             },
             "ingredients": ingredients,
-            "scenes": scenes
+            "scenes": scenes,
+            "resume": bool(resume_job_id),
+            "checkpoints": db.get_scene_checkpoints(run_jid) if resume_job_id else [],
         }
         
         if manager.flow_broker:
@@ -220,6 +222,7 @@ Trả về DUY NHẤT một JSON hợp lệ:
 
     async def wait(self, manager: Any, instance: dict[str, Any], started: dict[str, Any]) -> dict[str, Any]:
         run_jid = started.get("engine_run_id")
+        cfg = started.get("config", {})
         scene_count = started.get("scene_count", 3)
         title = started.get("title") or "Review Đồ Gia Dụng Tiện Ích ✨"
         
@@ -230,8 +233,9 @@ Trả về DUY NHẤT một JSON hợp lệ:
         if not broker:
             raise RuntimeError("FlowBroker is not initialized in manager")
 
+        timeout = int(cfg.get("video_timeout_sec") or cfg.get("timeout_sec") or 1800)
         # Event-driven wait (pure async, no filesystem polling)
-        res = await broker.wait_job(run_jid, timeout=600, expected_scenes=scene_count)
+        res = await broker.wait_job(run_jid, timeout=timeout, expected_scenes=scene_count)
         raw_clips = res.get("video_paths") or []
         if not raw_clips:
             raw_clips = broker.get_job_clips(run_jid)

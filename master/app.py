@@ -25,7 +25,7 @@ STATIC = ROOT / "master" / "static"
 MODULES = ROOT / "modules"
 PORT = int(os.getenv("V28_PORT", "3000"))
 HOST = os.getenv("V28_HOST", "127.0.0.1")
-VERSION = "2.8.5.9-windows-utf8-engine"
+VERSION = "2.8.6.0-anti-stuck-auto-resume"
 
 # Force legacy engines into render-only/in-process mode. V2.8 owns scheduling + Facebook publish.
 os.environ.setdefault("UNIFIED_MONOLITH", "1")

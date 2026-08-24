@@ -7,7 +7,7 @@ class Adapter:
             instance["id"], instance["name"], instance["config"], instance.get("engine_ref")
         )
 
-    async def start(self, manager: Any, instance: dict[str, Any]) -> dict[str, Any]:
+    async def start(self, manager: Any, instance: dict[str, Any], resume_job_id: str | None = None) -> dict[str, Any]:
         ref = await self.prepare(manager, instance)
         manager.set_engine_ref(instance["id"], ref)
         return await manager.engine.run_beauty(ref, instance["config"])

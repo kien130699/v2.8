@@ -175,9 +175,40 @@ def main() -> int:
             env["V28_SUPERVISED"] = "1"
             log("START child server")
             proc = subprocess.Popen(cmd, cwd=str(ROOT), env=env)
-            CHILD_PID.write_text(str(proc.pid), encoding="ascii")
+            started_at = time.time()
+            unresponsive_count = 0
+            code = None
             try:
-                code = proc.wait()
+                while proc.poll() is None:
+                    try:
+                        code = proc.wait(timeout=10)
+                        break
+                    except subprocess.TimeoutExpired:
+                        pass
+                    if stop_requested():
+                        log("STOP flag requested -> terminate child")
+                        try:
+                            proc.terminate()
+                            code = proc.wait(timeout=5)
+                        except Exception:
+                            proc.kill()
+                            code = proc.wait()
+                        break
+                    # After startup grace period of 25s, verify active HTTP health
+                    if time.time() - started_at > 25:
+                        h = _existing_v28_health(port)
+                        if h is None:
+                            unresponsive_count += 1
+                            log(f"HEALTH WARNING: server unresponsive {unresponsive_count}/4 on port {port}")
+                            if unresponsive_count >= 4:
+                                log(f"HEALTH CHECK FAILED: server event loop frozen (PID={proc.pid}); killing to restart...")
+                                _kill_tree(proc.pid, "Health check timeout / frozen event loop")
+                                code = proc.poll() or 1
+                                break
+                        else:
+                            unresponsive_count = 0
+                if code is None:
+                    code = proc.poll()
             except KeyboardInterrupt:
                 log("CTRL+C -> stop child")
                 try:

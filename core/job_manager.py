@@ -826,8 +826,8 @@ class JobManager:
         if active:
             with db.connect() as c:
                 for r in active:
-                    # Auto-resume: mark as queued for worker pickup with incremented attempt
-                    new_attempt = int(r.get("attempt") or 0) + 1
+                    # Auto-resume: mark as queued for worker pickup while preserving attempt budget
+                    new_attempt = int(r.get("attempt") or 0)
                     c.execute(
                         "UPDATE runs SET status='queued',attempt=?,error=NULL,updated_at=? WHERE id=?",
                         (new_attempt, ts, r["id"]),
@@ -835,7 +835,7 @@ class JobManager:
                     resumed_count += 1
             for r in active:
                 db.log_event(
-                    f"STARTUP RESUME {r['id']} · {r['status']} → queued (auto-reconcile attempt {int(r.get('attempt') or 0)+1})",
+                    f"STARTUP RESUME {r['id']} · {r['status']} → queued (auto-reconcile attempt {int(r.get('attempt') or 0)})",
                     level="INFO", kind="job", instance_id=str(r["instance_id"]), run_id=str(r["id"]),
                 )
         for r in queued:

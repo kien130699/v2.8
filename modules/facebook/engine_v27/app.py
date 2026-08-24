@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import hashlib
 import html
@@ -58,7 +58,7 @@ def log(msg: str) -> None:
 
 def run(cmd: list[str]) -> None:
     log("$ " + " ".join(str(x) for x in cmd))
-    subprocess.run(cmd, check=True, cwd=ROOT)
+    subprocess.run(cmd, check=True, cwd=ROOT, timeout=300)
 
 
 def require_binary(name: str) -> None:
@@ -84,6 +84,7 @@ def ffprobe_duration(path: Path) -> float:
         capture_output=True,
         text=True,
         cwd=ROOT,
+        timeout=30,
     )
     return float(result.stdout.strip())
 
@@ -105,6 +106,7 @@ def ffprobe_has_audio(path: Path) -> bool:
         capture_output=True,
         text=True,
         cwd=ROOT,
+        timeout=30,
     )
     return result.returncode == 0 and bool(result.stdout.strip())
 
@@ -177,7 +179,7 @@ def download_file(url: str, dest: Path) -> None:
             "--connect-timeout", "20", "--max-time", "600",
             "-o", str(part), url,
         ]
-        result = subprocess.run(cmd, cwd=ROOT)
+        result = subprocess.run(cmd, cwd=ROOT, timeout=300)
         if result.returncode == 0 and part.exists() and part.stat().st_size > 1024:
             part.replace(dest)
             return
@@ -432,7 +434,7 @@ def try_edge_tts_once(text: str, voice: str, rate: str, mp3: Path, srt: Path) ->
         str(srt),
     ]
     log("$ " + " ".join(str(x) for x in cmd))
-    result = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
+    result = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, timeout=120)
     ok = (
         result.returncode == 0
         and mp3.exists()
@@ -857,7 +859,7 @@ def motion_score(
         "-vf", f"fps={sample_fps},scale={w}:{h}:flags=fast_bilinear,format=gray",
         "-f", "rawvideo", "-pix_fmt", "gray", "-"
     ]
-    result = subprocess.run(cmd, capture_output=True, cwd=ROOT)
+    result = subprocess.run(cmd, capture_output=True, cwd=ROOT, timeout=60)
     if result.returncode != 0 or not result.stdout:
         return 0.0
     frame_size = w * h

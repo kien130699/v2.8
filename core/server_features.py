@@ -43,7 +43,16 @@ def checkpoint(run_id: str, scene_key: str, media_type: str, status: str, *, out
     with db.connect() as c:
         c.execute(
             "INSERT INTO scene_checkpoints(id,run_id,scene_key,media_type,status,output_path,attempts,last_error,payload_json,created_at,updated_at) VALUES(?,?,?,?,?,?,0,?,?,?,?) "
-            "ON CONFLICT(run_id,scene_key,media_type) DO UPDATE SET status=excluded.status,output_path=excluded.output_path,attempts=scene_checkpoints.attempts+CASE WHEN excluded.status='retry' THEN 1 ELSE 0 END,last_error=excluded.last_error,payload_json=excluded.payload_json,updated_at=excluded.updated_at",
+            "ON CONFLICT(run_id,scene_key,media_type) DO UPDATE SET "
+            "status=CASE "
+            "  WHEN scene_checkpoints.status IN ('done','completed','ready','DOWNLOADED','DONE') AND excluded.status IN ('pending','running','queued','NOT_STARTED','RUNNING') THEN scene_checkpoints.status "
+            "  ELSE excluded.status "
+            "END, "
+            "output_path=CASE WHEN excluded.output_path != '' THEN excluded.output_path ELSE scene_checkpoints.output_path END, "
+            "attempts=scene_checkpoints.attempts+CASE WHEN excluded.status='retry' THEN 1 ELSE 0 END, "
+            "last_error=excluded.last_error, "
+            "payload_json=CASE WHEN excluded.payload_json != '{}' THEN excluded.payload_json ELSE scene_checkpoints.payload_json END, "
+            "updated_at=excluded.updated_at",
             (f"{run_id}:{scene_key}:{media_type}", run_id, scene_key, media_type, status, output_path, str(error or "")[:2000], db.dumps(payload or {}), ts, ts),
         )
 

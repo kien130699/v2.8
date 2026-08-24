@@ -205,8 +205,10 @@ Trả về DUY NHẤT một JSON hợp lệ:
         if not broker:
             raise RuntimeError("FlowBroker is not initialized in manager")
 
+        cfg = started.get("config", {})
+        timeout = int(cfg.get("video_timeout_sec") or cfg.get("timeout_sec") or 1800)
         # Event-driven wait (pure async, no filesystem polling)
-        res = await broker.wait_job(run_jid, timeout=600, expected_scenes=scene_count)
+        res = await broker.wait_job(run_jid, timeout=timeout, expected_scenes=scene_count)
         raw_clips = res.get("video_paths") or []
         if not raw_clips:
             raw_clips = broker.get_job_clips(run_jid)
