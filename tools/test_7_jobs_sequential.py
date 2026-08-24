@@ -243,10 +243,10 @@ class SequentialTester:
         # Define 7 distinct tests matching available templates
         suite_plan = [
             (1, "BASIC_RUN_ORCHESTRATION", "1", {}, "NORMAL"),
-            (2, "SCENE_CHECKPOINT_INTEGRITY", "2", {}, "NORMAL"),
+            (2, "SCENE_CHECKPOINT_INTEGRITY", "2", {"auto_generate_angles": False}, "NORMAL"),
             (3, "MEDIA_TRACKING_LIFECYCLE", "3", {}, "NORMAL"),
             (4, "DOWNLOAD_LOCAL_PERSISTENCE", "4", {}, "NORMAL"),
-            (5, "FAILED_ATTEMPT_RETRY_ISOLATION", "5", {}, "NORMAL"),
+            (5, "FAILED_ATTEMPT_RETRY_ISOLATION", "5", {"auto_generate_angles": False}, "NORMAL"),
             (6, "CANCEL_JOB_IDENTITY_GUARD", "6", {}, "INJECT_CANCEL"),
             (7, "FULL_FLOW_AND_QC_PIPELINE", "7", {}, "NORMAL"),
         ]
