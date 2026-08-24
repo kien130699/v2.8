@@ -769,3 +769,8 @@ async def unhandled(_: Request, exc: Exception):
     event_id = f"err_{os.urandom(4).hex()}"
     db.log_event(f"{event_id} Unhandled: {type(exc).__name__}: {exc}", level="ERROR", kind="system")
     return JSONResponse(status_code=500, content={"detail": f"Internal error ({event_id}). Xem Logs để biết chi tiết."})
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("master.app:app", host=HOST, port=PORT, log_level="info", reload=False)
