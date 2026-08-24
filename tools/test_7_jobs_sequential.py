@@ -77,11 +77,13 @@ class SequentialTester:
         broker_status = request_json("GET", f"{self.base_url}/api/status").get("flow", {})
         recent_logs = query_db("SELECT id, ts, kind, level, message FROM event_logs WHERE run_id=? OR message LIKE ? ORDER BY id DESC LIMIT 15",
                                (run_id, f"%{run_id}%"))
-        cps = query_db("SELECT scene_key, scene_index, status, attempt_id, progress, last_error FROM scene_checkpoints WHERE run_id=? ORDER BY scene_index", (run_id,))
+        cps = query_db("SELECT * FROM scene_checkpoints WHERE run_id=?", (run_id,))
         run_row = query_db("SELECT * FROM runs WHERE id=?", (run_id,))
 
         suspected = "UNKNOWN"
-        if not broker_status.get("extensionConnected") and not self.real_flow:
+        if last_status in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled"}:
+            suspected = "NONE"
+        elif not broker_status.get("extensionConnected") and not self.real_flow:
             suspected = "WAITING_FLOW_EXPECTED"
         elif broker_status.get("active") and time.time() - (broker_status.get("active", {}).get("startedAt") or time.time()) > 100:
             suspected = "FLOW_WORKER_PROGRESS_FREEZE"
@@ -153,11 +155,10 @@ class SequentialTester:
                 self.log(f"JOB-{seq:02d}", f"Cancel response: {cancel_res}")
 
             # Terminal conditions
-            if status in {"completed", "done", "published", "dry_run_ok", "cancelled", "failed"}:
+            if status in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled", "failed"}:
                 final_state = run_data
                 break
             if not self.real_flow and status in {"waiting_flow", "queued"}:
-                # In Tier 1 without real Flow extension, reaching waiting_flow / queued confirms correct orchestration!
                 time.sleep(3.0)
                 final_state = run_data
                 break
@@ -172,7 +173,7 @@ class SequentialTester:
         job_file.write_text(json.dumps(diag, indent=2, ensure_ascii=False), encoding="utf-8")
 
         status_flag = diag.get("lastStatus")
-        is_success = status_flag in {"completed", "done", "published", "dry_run_ok", "cancelled"} or (not self.real_flow and status_flag in {"waiting_flow", "queued"})
+        is_success = status_flag in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled"} or (not self.real_flow and status_flag in {"waiting_flow", "queued"})
         badge = "SUCCESS" if is_success else "ERROR"
         self.log(f"JOB-{seq:02d}", f"HOÀN THÀNH TEST ({elapsed}s) -> Kết quả: {status_flag}", level=badge)
 
@@ -208,7 +209,7 @@ class SequentialTester:
             self.job_results.append(res)
             
             st = res.get("lastStatus") or res.get("status")
-            ok = st in {"completed", "done", "published", "dry_run_ok", "cancelled"} or (not self.real_flow and st in {"waiting_flow", "queued"})
+            ok = st in {"completed", "done", "done_no_pages", "published", "dry_run_ok", "cancelled"} or (not self.real_flow and st in {"waiting_flow", "queued"})
             if not ok and self.fail_fast:
                 self.log("SUITE", f"DỪNG TOÀN BỘ SUITE TẠI JOB {seq} DO FAIL_FAST=TRUE", level="ERROR")
                 break
