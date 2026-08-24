@@ -769,8 +769,6 @@ class JobManager:
                             c.execute("UPDATE publish_jobs SET status='retry_wait',retry_after=?,updated_at=? WHERE id=?", (retry_at, db.now_iso(), pid))
             self._update_run(run_id, status="publish_queued")
             db.log_event(f"{instance['id']} render 1 lần → queue {len(pages)} Page", kind="facebook", instance_id=instance["id"], run_id=run_id, payload={"pages": [p["page_id"] for p in pages], "videos": len(videos)})
-        finally:
-            self._run_queue_event.set()
         except asyncio.CancelledError:
             self._update_run(run_id, status="interrupted", error="Task cancelled", finished_at=db.now_iso())
             raise
@@ -783,6 +781,7 @@ class JobManager:
             db.log_event(str(exc), level="ERROR", kind="job", instance_id=instance["id"], run_id=run_id)
             _safe_print(f"[V2.8 JOB] FAILED {instance['id']} · {run_id} · {exc}", flush=True)
         finally:
+            self._run_queue_event.set()
             heartbeat.cancel()
             await asyncio.gather(heartbeat, return_exceptions=True)
 
