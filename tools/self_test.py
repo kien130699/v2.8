@@ -290,6 +290,56 @@ def test_celebrity_prepare_resolved_scope(tmp: Path) -> None:
         if old_serper is None: os.environ.pop("SERPER_API_KEY", None)
         else: os.environ["SERPER_API_KEY"] = old_serper
 
+def test_authoritative_checkpoint_monotonic(tmp: Path) -> None:
+    from core import db
+    db_file = tmp / "test_cp.sqlite3"
+    old_db = db.DB_PATH
+    db.DB_PATH = db_file
+    try:
+        db.init_db()
+        with db.connect() as c:
+            c.execute("INSERT INTO job_templates(id, slug, name, engine, created_at, updated_at) VALUES('tpl', 'tpl_slug', 'Tpl', 'custom', '2026-08-24T00:00:00', '2026-08-24T00:00:00')")
+            c.execute("INSERT INTO job_instances(id, template_id, name, config_json, created_at, updated_at) VALUES('inst_test', 'tpl', 'Test', '{}', '2026-08-24T00:00:00', '2026-08-24T00:00:00')")
+            c.execute("INSERT INTO runs(id, instance_id, template_id, engine, status, created_at, updated_at) VALUES('run_mon', 'inst_test', 'tpl', 'custom', 'running', '2026-08-24T00:00:00', '2026-08-24T00:00:00')")
+        # 1. Normal save to DONE
+        db.save_scene_checkpoint("job_mon", 0, run_id="run_mon", scene_id=1, status="DONE", attempt_id="1")
+        cp = db.get_scene_checkpoint("job_mon", 0)
+        assert cp["status"] == "DONE"
+        
+        # 2. Late event RUNNING on attempt 1 should be IGNORED (monotonic protection)
+        db.save_scene_checkpoint("job_mon", 0, run_id="run_mon", scene_id=1, status="RUNNING", attempt_id="1")
+        cp = db.get_scene_checkpoint("job_mon", 0)
+        assert cp["status"] == "DONE"
+
+        # 3. Mark scene 2 as FAILED on attempt 1
+        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="FAILED", attempt_id="1")
+        cp2 = db.get_scene_checkpoint("job_mon", 1)
+        assert cp2["status"] == "FAILED"
+
+        # 4. Retry attempt 2 should be ALLOWED to transition to RUNNING
+        db.save_scene_checkpoint("job_mon", 1, run_id="run_mon", scene_id=2, status="RUNNING", attempt_id="2")
+        cp2_retry = db.get_scene_checkpoint("job_mon", 1)
+        assert cp2_retry["status"] == "RUNNING"
+    finally:
+        db.DB_PATH = old_db
+
+
+def test_facebook_upload_session_idempotency(tmp: Path) -> None:
+    from core import db
+    db_file = tmp / "test_fb.sqlite3"
+    old_db = db.DB_PATH
+    db.DB_PATH = db_file
+    try:
+        db.init_db()
+        with db.connect() as c:
+            cols = {r[1] for r in c.execute("PRAGMA table_info(publish_jobs)").fetchall()}
+        assert "upload_session_id" in cols
+        assert "upload_offset" in cols
+        assert "idempotency_key" in cols
+    finally:
+        db.DB_PATH = old_db
+
+
 def test_console_guard() -> None:
     start_bat = (ROOT / "START.bat").read_text("utf-8")
     sup = (ROOT / "supervisor.py").read_text("utf-8")
@@ -308,6 +358,8 @@ def main() -> None:
         test_static()
         test_env_loader()
         test_celebrity_prepare_resolved_scope(tmp)
+        test_authoritative_checkpoint_monotonic(tmp)
+        test_facebook_upload_session_idempotency(tmp)
         test_console_guard()
     sup = (ROOT / "supervisor.py").read_text("utf-8")
     assert "server HALTED but supervisor stays alive" in sup and "CONSOLE_LOG" in sup

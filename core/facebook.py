@@ -282,6 +282,18 @@ def publish_one(pub_id: str) -> dict[str, Any]:
             pass
 
     try:
+        existing_vid = str(job.get("fb_video_id") or "")
+        existing_upload_url = str(job.get("upload_session_id") or "")
+        if existing_vid and str(job.get("status") or "") in {"uploading", "finishing", "retry_wait"}:
+            try:
+                finish = _finish_reel(page, existing_vid, str(job.get("title") or ""), str(job.get("description") or ""))
+                result = {"video_id": existing_vid, "upload": "resumed_session", "finish": finish, "preflight": preflight}
+                _update_publish(pub_id, status="published", result_json=db.dumps(result), error=None)
+                db.log_event(f"Facebook published (resumed finish) → {page['name']} · {existing_vid}", kind="facebook", run_id=job.get("run_id"), payload={"page_id": page["id"], "publish_id": pub_id})
+                return {"ok": True, **result}
+            except Exception as finish_exc:
+                db.log_event(f"Facebook resume finish failed, checking upload url: {finish_exc}", level="WARNING", kind="facebook")
+
         _update_publish(pub_id, status="starting", error=None)
         start = request_json(
             "POST", graph_url(f"{page['id']}/video_reels"),
@@ -291,7 +303,7 @@ def publish_one(pub_id: str) -> dict[str, Any]:
         upload_url = str(start.get("upload_url") or "")
         if not video_id or not upload_url:
             raise RuntimeError(f"Facebook không trả video_id/upload_url: {start}")
-        _update_publish(pub_id, status="uploading", fb_video_id=video_id)
+        _update_publish(pub_id, status="uploading", fb_video_id=video_id, upload_session_id=upload_url)
         size = path.stat().st_size
         headers = {
             "Authorization": f"OAuth {page['access_token']}",
@@ -301,7 +313,7 @@ def publish_one(pub_id: str) -> dict[str, Any]:
         }
         with path.open("rb") as f:
             upload = request_json("POST", upload_url, headers=headers, data=f)
-        _update_publish(pub_id, status="finishing")
+        _update_publish(pub_id, status="finishing", upload_offset=size)
         finish = _finish_reel(page, video_id, str(job.get("title") or ""), str(job.get("description") or ""))
         result = {"video_id": video_id, "upload": upload, "finish": finish, "preflight": preflight}
         _update_publish(pub_id, status="published", result_json=db.dumps(result), error=None)

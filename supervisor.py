@@ -158,7 +158,8 @@ def main() -> int:
     STOP_FLAG.unlink(missing_ok=True)
     port = int(os.environ.get("V28_PORT", "3000"))
     if port != 3000:
-        log(f"WARNING: V2.8 isolation expects port 3000, current V28_PORT={port}")
+        log(f"ERROR: V2.8 hard isolation requires port 3000. Provided V28_PORT={port} is rejected.")
+        return _halt_after_fatal(3)
     if not ensure_single_instance(port):
         log("Supervisor HALTED due to port conflict; giữ terminal để xem lỗi. STOP.bat/Ctrl+C để thoát.")
         return _halt_after_fatal(2)

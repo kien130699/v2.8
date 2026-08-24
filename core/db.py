@@ -254,6 +254,11 @@ def init_db() -> None:
         _add_column(c, "job_templates", "version INTEGER NOT NULL DEFAULT 1")
         _add_column(c, "job_instances", "template_version INTEGER NOT NULL DEFAULT 1")
         
+        # Publish jobs session tracking & idempotency
+        _add_column(c, "publish_jobs", "upload_session_id TEXT")
+        _add_column(c, "publish_jobs", "upload_offset INTEGER NOT NULL DEFAULT 0")
+        _add_column(c, "publish_jobs", "idempotency_key TEXT")
+
         # Unify schema migrations for checkpoint tables across versions
         _add_column(c, "flow_scene_checkpoints", "run_id TEXT")
         _add_column(c, "flow_scene_checkpoints", "scene_key TEXT NOT NULL DEFAULT ''")
@@ -268,6 +273,18 @@ def init_db() -> None:
         _add_column(c, "scene_checkpoints", "local_path TEXT NOT NULL DEFAULT ''")
         _add_column(c, "scene_checkpoints", "progress INTEGER NOT NULL DEFAULT 0")
         _add_column(c, "scene_checkpoints", "error TEXT")
+        _add_column(c, "scene_checkpoints", "attempt_id TEXT NOT NULL DEFAULT '0'")
+        _add_column(c, "scene_checkpoints", "attempt INTEGER NOT NULL DEFAULT 0")
+
+        # Safe migration: populate authoritative scene_checkpoints from existing flow_scene_checkpoints without deleting old table
+        try:
+            c.execute("""
+            INSERT OR IGNORE INTO scene_checkpoints(id, run_id, job_id, scene_key, scene_index, scene_id, media_type, status, output_path, local_path, progress, attempts, last_error, payload_json, created_at, updated_at)
+            SELECT COALESCE(run_id, job_id) || ':' || scene_id || ':video', COALESCE(run_id, job_id), job_id, 'scene_' || scene_id, scene_index, scene_id, 'video', status, COALESCE(local_path, ''), COALESCE(local_path, ''), progress, 0, error, payload_json, created_at, updated_at
+            FROM flow_scene_checkpoints
+            """)
+        except Exception:
+            pass
 
         if "flow_outbox" in {str(r[0]) for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}:
             _add_column(c, "flow_outbox", "dedupe_key TEXT")
@@ -363,22 +380,29 @@ def prune_logs(keep: int = 10000) -> int:
         return int(cur.rowcount or 0)
 
 
-def save_scene_checkpoint(job_id: str, scene_index: int, *, scene_id: int = 1,
+def save_scene_checkpoint(job_id: str, scene_index: int, *, run_id: str | None = None, scene_id: int = 1,
                           image_media_id: str | None = None, video_media_id: str | None = None,
                           local_path: str | None = None, status: str = "NOT_STARTED",
-                          progress: int = 0, error: str | None = None, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+                          progress: int = 0, attempt_id: str = "0", error: str | None = None,
+                          payload: dict[str, Any] | None = None) -> dict[str, Any]:
     ts = now_iso()
     uid = f"{job_id}_{scene_index}"
+    actual_run_id = run_id or job_id
+    scene_key = f"scene_{scene_id}"
+    media_type = "video"
     with connect() as c:
+        # Write to legacy table flow_scene_checkpoints
         c.execute(
-            """INSERT INTO flow_scene_checkpoints(id, job_id, scene_index, scene_id, image_media_id, video_media_id,
-                                            local_path, status, progress, error, payload_json, created_at, updated_at)
-               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """INSERT INTO flow_scene_checkpoints(id, job_id, run_id, scene_key, scene_index, scene_id, image_media_id, video_media_id,
+                                            local_path, output_path, status, progress, error, payload_json, created_at, updated_at)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                ON CONFLICT(job_id, scene_index) DO UPDATE SET
                    scene_id = COALESCE(excluded.scene_id, flow_scene_checkpoints.scene_id),
+                   run_id = COALESCE(excluded.run_id, flow_scene_checkpoints.run_id),
                    image_media_id = COALESCE(excluded.image_media_id, flow_scene_checkpoints.image_media_id),
                    video_media_id = COALESCE(excluded.video_media_id, flow_scene_checkpoints.video_media_id),
                    local_path = COALESCE(excluded.local_path, flow_scene_checkpoints.local_path),
+                   output_path = COALESCE(excluded.output_path, flow_scene_checkpoints.output_path),
                    status = CASE
                        WHEN flow_scene_checkpoints.status IN ('DONE', 'COMPLETED', 'DOWNLOADED', 'ready') AND excluded.status IN ('RUNNING', 'PENDING', 'NOT_STARTED', 'SUBMITTED', 'queued', 'pending') THEN flow_scene_checkpoints.status
                        WHEN flow_scene_checkpoints.status = 'FAILED' AND excluded.status IN ('RUNNING', 'PENDING', 'NOT_STARTED', 'queued', 'pending') THEN flow_scene_checkpoints.status
@@ -389,21 +413,54 @@ def save_scene_checkpoint(job_id: str, scene_index: int, *, scene_id: int = 1,
                    payload_json = CASE WHEN excluded.payload_json != '{}' THEN excluded.payload_json ELSE flow_scene_checkpoints.payload_json END,
                    updated_at = excluded.updated_at
             """,
-            (uid, str(job_id), int(scene_index), int(scene_id), image_media_id, video_media_id,
-             local_path, str(status), int(progress), error, dumps(payload or {}), ts, ts)
+            (uid, str(job_id), str(actual_run_id), scene_key, int(scene_index), int(scene_id), image_media_id, video_media_id,
+             local_path, local_path or "", str(status), int(progress), error, dumps(payload or {}), ts, ts)
+        )
+        # Write to authoritative table scene_checkpoints
+        sc_uid = f"{actual_run_id}:{scene_key}:{media_type}"
+        c.execute(
+            """INSERT INTO scene_checkpoints(id, run_id, job_id, scene_key, scene_index, scene_id, media_type, status,
+                                             output_path, local_path, progress, attempts, attempt_id, last_error, payload_json, created_at, updated_at)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+               ON CONFLICT(run_id, scene_key, media_type) DO UPDATE SET
+                   job_id = COALESCE(excluded.job_id, scene_checkpoints.job_id),
+                   scene_index = COALESCE(excluded.scene_index, scene_checkpoints.scene_index),
+                   scene_id = COALESCE(excluded.scene_id, scene_checkpoints.scene_id),
+                   image_media_id = COALESCE(excluded.image_media_id, scene_checkpoints.image_media_id),
+                   video_media_id = COALESCE(excluded.video_media_id, scene_checkpoints.video_media_id),
+                   local_path = COALESCE(excluded.local_path, scene_checkpoints.local_path),
+                   output_path = COALESCE(excluded.output_path, scene_checkpoints.output_path),
+                   status = CASE
+                       WHEN scene_checkpoints.status IN ('done','completed','ready','DOWNLOADED','DONE') AND excluded.status IN ('pending','running','queued','NOT_STARTED','RUNNING','SUBMITTED') THEN scene_checkpoints.status
+                       WHEN scene_checkpoints.status IN ('failed','FAILED') AND excluded.status IN ('pending','running','queued','NOT_STARTED','RUNNING') AND excluded.attempt_id = scene_checkpoints.attempt_id THEN scene_checkpoints.status
+                       ELSE excluded.status
+                   END,
+                   progress = MAX(excluded.progress, scene_checkpoints.progress),
+                   attempts = scene_checkpoints.attempts + CASE WHEN excluded.status IN ('retry','RETRY') THEN 1 ELSE 0 END,
+                   attempt_id = excluded.attempt_id,
+                   last_error = excluded.last_error,
+                   payload_json = CASE WHEN excluded.payload_json != '{}' THEN excluded.payload_json ELSE scene_checkpoints.payload_json END,
+                   updated_at = excluded.updated_at
+            """,
+            (sc_uid, str(actual_run_id), str(job_id), scene_key, int(scene_index), int(scene_id), media_type, str(status),
+             local_path or "", local_path or "", int(progress), 0, str(attempt_id), str(error or "")[:2000], dumps(payload or {}), ts, ts)
         )
     return get_scene_checkpoint(job_id, scene_index) or {}
 
 
-def get_scene_checkpoints(job_id: str) -> list[dict[str, Any]]:
-    rs = rows("SELECT * FROM flow_scene_checkpoints WHERE job_id=? ORDER BY scene_index ASC", (str(job_id),))
+def get_scene_checkpoints(identifier: str) -> list[dict[str, Any]]:
+    rs = rows("SELECT * FROM scene_checkpoints WHERE run_id=? OR job_id=? ORDER BY scene_index ASC, scene_id ASC", (str(identifier), str(identifier)))
+    if not rs:
+        rs = rows("SELECT * FROM flow_scene_checkpoints WHERE job_id=? OR run_id=? ORDER BY scene_index ASC", (str(identifier), str(identifier)))
     for r in rs:
         r["payload"] = loads(r.pop("payload_json", "{}"), {})
     return rs
 
 
 def get_scene_checkpoint(job_id: str, scene_index: int) -> dict[str, Any] | None:
-    r = row("SELECT * FROM flow_scene_checkpoints WHERE job_id=? AND scene_index=?", (str(job_id), int(scene_index)))
+    r = row("SELECT * FROM scene_checkpoints WHERE (job_id=? OR run_id=?) AND (scene_index=? OR scene_id=?)", (str(job_id), str(job_id), int(scene_index), int(scene_index) + 1))
+    if not r:
+        r = row("SELECT * FROM flow_scene_checkpoints WHERE job_id=? AND scene_index=?", (str(job_id), int(scene_index)))
     if r:
         r["payload"] = loads(r.pop("payload_json", "{}"), {})
     return r

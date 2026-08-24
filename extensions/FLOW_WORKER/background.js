@@ -1136,6 +1136,23 @@ async function connectServerBridge(force=false){
       failSafeStopAll(String(message.reason||'server_stop_all'),{closeSocket:true,sendAck:true}).catch(()=>{});
       return;
     }
+    if(message?.type==='CANCEL_JOB'){
+      const targetJobId = String(message?.jobId || '');
+      const targetAttemptId = message?.attemptId ? String(message.attemptId) : null;
+      const currentJobId = String(runtimeCache?.serverJobId || '');
+      const currentAttemptId = runtimeCache?.attemptId ? String(runtimeCache.attemptId) : null;
+      if(targetAttemptId && currentAttemptId && targetAttemptId !== currentAttemptId){
+        return;
+      }
+      if(!targetJobId || targetJobId === currentJobId){
+        appendLog(`⚠️ SERVER CANCELLED JOB ${targetJobId}: ${message?.reason || 'cancelled'}`, 'warn').catch(()=>{});
+        if(runtimeCache){
+          runtimeCache.running = false;
+          runtimeCache.progressLabel = 'Đã hủy theo yêu cầu server';
+        }
+      }
+      return;
+    }
     if(message?.type==='DOWNLOAD_MEDIA_FILES'){
       queueMediaRecovery('recover video',()=>downloadMediaIdsForServer({jobId:String(message.jobId||''),sceneId:Number(message.sceneId||0),mediaIds:message.mediaIds||[]}))
         .catch(async error=>{await appendLog(`❌ RECOVER VIDEO: ${error?.message||error}`,'error');await sendOrStoreServerReport({type:'VIDEO_FILE_ERROR',jobId:message.jobId,sceneId:message.sceneId,error:error?.message||String(error)});});

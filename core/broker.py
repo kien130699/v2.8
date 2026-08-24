@@ -424,8 +424,16 @@ class FlowBroker:
             "source": done.source,
         })
         if self.extension:
-            await self._send_ext({"type": "CANCEL_JOB", "jobId": done.job_id, "reason": reason})
-            await self._send_ext({"type": "FLOW_CONTROL", "action": "stop", "reason": reason, "jobId": done.job_id})
+            run_id = str(done.message.get("runId") or done.job_id)
+            attempt_id = str(done.message.get("attemptId") or done.message.get("attempt") or "1")
+            await self._send_ext({
+                "type": "CANCEL_JOB",
+                "jobId": done.job_id,
+                "runId": run_id,
+                "attemptId": attempt_id,
+                "reason": reason,
+            })
+            await self._send_ext({"type": "FLOW_CONTROL", "action": "stop", "reason": reason, "jobId": done.job_id, "attemptId": attempt_id})
         self.event.set()
 
     async def _send_ext(self, msg: dict[str, Any]) -> bool:
