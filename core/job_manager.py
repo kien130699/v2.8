@@ -808,12 +808,26 @@ class JobManager:
         if not run:
             raise KeyError(run_id)
         status = str(run.get("status") or "")
-        if status in {"queued", "waiting_flow", "waiting_engine", "dispatching"}:
+        if status in {"queued", "waiting_flow", "waiting_engine", "dispatching", "preparing", "running", "rendering"}:
+            # Cancel engine job if active
+            for jid in run.get("engine_job_ids") or []:
+                try:
+                    self.broker.cancel_job(str(jid), reason="user_cancelled_run", run_id=run_id, attempt_id=str(run.get("attempt") or "1"))
+                except Exception:
+                    pass
             self._update_run(run_id, status="interrupted", error="Đã hủy bởi người dùng", finished_at=db.now_iso())
+            # Release memory engine lock if owned
+            template_id = str(run.get("template_id") or "")
+            if self._engine_owners.get(template_id) == run_id:
+                self._engine_owners.pop(template_id, None)
+                lock = self._engine_locks.get(template_id)
+                if lock and lock.locked():
+                    try:
+                        lock.release()
+                    except RuntimeError:
+                        pass
             self._run_queue_event.set()
             return {"ok": True, "run_id": run_id, "status": "interrupted"}
-        if status in {"preparing", "running", "rendering"}:
-            raise RuntimeError("Run đã vào engine; chưa thể hủy an toàn từ core V2.8")
         return {"ok": True, "run_id": run_id, "status": status, "unchanged": True}
 
     def recover_orphaned_runs(self) -> int:
