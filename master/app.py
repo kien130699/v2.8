@@ -19,6 +19,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 from core.env_loader import load_project_env, env_status, env_file_info
 load_project_env()
 STATIC = ROOT / "master" / "static"
